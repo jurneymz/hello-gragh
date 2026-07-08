@@ -1,0 +1,158 @@
+<style>
+  :root{
+    --bg:#eef1f6;--grid:#d6dbe6;--surface:#ffffff;--surface-2:#f6f8fc;
+    --ink:#141a24;--muted:#5a6473;--line:#c9d0dc;--line-strong:#8b95a6;
+    --accent:#0c8ea3;
+    --react:#d97a06;--graph:#0c8ea3;--anatomy:#0c8ea3;--lg:#5b54d6;--obs:#2563eb;--sec:#4457b5;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#0c0f16;--grid:#181e2a;--surface:#141a24;--surface-2:#0f141d;
+    --ink:#e7ebf3;--muted:#8c96a8;--line:#293241;--line-strong:#556173;--accent:#3bd6e6;
+    --react:#f5a524;--graph:#3bd6e6;--anatomy:#3bd6e6;--lg:#9d97ff;--obs:#6ea8ff;--sec:#8f9bf0;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);}}
+  :root[data-theme="light"]{--bg:#eef1f6;--grid:#d6dbe6;--surface:#ffffff;--surface-2:#f6f8fc;
+    --ink:#141a24;--muted:#5a6473;--line:#c9d0dc;--line-strong:#8b95a6;--accent:#0c8ea3;
+    --react:#d97a06;--graph:#0c8ea3;--anatomy:#0c8ea3;--lg:#5b54d6;--obs:#2563eb;--sec:#4457b5;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);}
+  :root[data-theme="dark"]{--bg:#0c0f16;--grid:#181e2a;--surface:#141a24;--surface-2:#0f141d;
+    --ink:#e7ebf3;--muted:#8c96a8;--line:#293241;--line-strong:#556173;--accent:#3bd6e6;
+    --react:#f5a524;--graph:#3bd6e6;--anatomy:#3bd6e6;--lg:#9d97ff;--obs:#6ea8ff;--sec:#8f9bf0;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);}
+  *{box-sizing:border-box}
+  a{color:inherit;text-decoration:none}
+  .wrap{font-family:var(--sans);color:var(--ink);background:var(--bg);
+    background-image:radial-gradient(var(--grid) 1px,transparent 1px);background-size:22px 22px;
+    min-height:100vh;padding:clamp(20px,4vw,64px)}
+  .page{max-width:900px;margin:0 auto}
+  header{margin-bottom:8px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong)}
+  h1{font-size:clamp(34px,7vw,62px);line-height:1;letter-spacing:-.03em;font-weight:800;margin:16px 0 0;text-wrap:balance}
+  .lede{max-width:60ch;margin:16px 0 0;color:var(--muted);font-size:clamp(15px,2vw,18px);line-height:1.55}
+  .meta{margin-top:16px;font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+  .meta b{color:var(--ink)}
+
+  .path{margin-top:40px;position:relative}
+  .stop{display:grid;grid-template-columns:44px 1fr;gap:18px;padding-bottom:20px}
+  @media(max-width:560px){.stop{grid-template-columns:32px 1fr;gap:12px}}
+  .rail{position:relative;display:flex;justify-content:center}
+  .rail .num{width:34px;height:34px;border-radius:50%;background:var(--surface);border:2px solid var(--ac);
+    color:var(--ac);font-family:var(--mono);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:1;margin-top:2px}
+  @media(max-width:560px){.rail .num{width:28px;height:28px;font-size:12px}}
+  .rail::before{content:"";position:absolute;top:2px;bottom:-20px;width:2px;background:var(--line)}
+  .stop:last-child .rail::before{display:none}
+
+  .cardlink{display:block;border:1px solid var(--line);border-top:3px solid var(--ac);border-radius:15px;
+    background:var(--surface);box-shadow:var(--shadow);padding:18px 20px;transition:transform .13s,border-color .13s,box-shadow .13s}
+  .cardlink:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(20,26,36,.09),0 16px 44px rgba(20,26,36,.13)}
+  .cardlink:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+  .ch{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  .ct{font-size:20px;font-weight:800;letter-spacing:-.01em}
+  .cstage{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ac);font-weight:600}
+  .cd{font-size:14px;color:var(--muted);line-height:1.55;margin-top:6px;max-width:64ch}
+  .ctags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .ctag{font-family:var(--mono);font-size:10.5px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+  .cgo{font-family:var(--mono);font-size:12px;color:var(--ac);font-weight:600;margin-top:12px;display:inline-flex;align-items:center;gap:5px}
+
+  .stop.s1{--ac:var(--react)} .stop.s2{--ac:var(--graph)} .stop.s3{--ac:var(--anatomy)}
+  .stop.s4{--ac:var(--lg)} .stop.s5{--ac:var(--obs)} .stop.s6{--ac:var(--sec)}
+
+  .repo{margin-top:14px;border:1px dashed var(--line-strong);border-radius:15px;background:var(--surface-2);padding:18px 20px}
+  .repo .ct{font-size:18px;font-weight:800;display:flex;align-items:center;gap:9px}
+  .repo .cd{margin-top:6px}
+  .repo code{font-family:var(--mono);font-size:12px;background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+  .files{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .files span{font-family:var(--mono);font-size:10.5px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+
+  .foot{margin-top:36px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:16px;align-items:flex-start}
+  .foot .bar{width:3px;align-self:stretch;background:linear-gradient(var(--react),var(--lg),var(--sec));border-radius:3px;flex:none}
+  .foot p{margin:0;font-size:14px;line-height:1.55;color:var(--muted)} .foot b{color:var(--ink)}
+  @media(prefers-reduced-motion:reduce){.cardlink{transition:none}}
+</style>
+
+<div class="wrap"><div class="page">
+  <header>
+    <div class="eyebrow"><span>Strands Agents</span><span class="dot"></span><span>Bedrock AgentCore</span></div>
+    <h1>에이전트 지식 맵</h1>
+    <p class="lede">Strands + Bedrock AgentCore로 에이전트를 <b>만들고 · 이해하고 · 비교하고 · 믿게</b> 만드는 여정. 아래 순서대로 따라가면 처음 갈림길부터 프로덕션 보안까지 한 바퀴 돕니다.</p>
+    <div class="meta"><span>인터랙티브 페이지 <b>6</b></span><span>파이썬 샘플 <b>9</b></span><span>공식 문서 검증 <b>2026-07</b></span></div>
+  </header>
+
+  <div class="path">
+    <!-- 1 -->
+    <div class="stop s1">
+      <div class="rail"><div class="num">1</div></div>
+      <a class="cardlink" href="https://claude.ai/code/artifact/151c3170-83a2-4462-ad4e-e7472a82e107" target="_blank" rel="noopener">
+        <div class="ch"><span class="ct">ReAct vs Graph</span><span class="cstage">기초 · 첫 갈림길</span></div>
+        <div class="cd">같은 작업을 줬을 때, 모델이 스스로 루프를 돌 것인가(ReAct) 정해진 그래프를 따를 것인가(Graph). 나란히 실행해 흐름을 비교.</div>
+        <div class="ctags"><span class="ctag">agentic loop</span><span class="ctag">deterministic DAG</span><span class="ctag">비결정 vs 결정</span></div>
+        <div class="cgo">열기 →</div>
+      </a>
+    </div>
+    <!-- 2 -->
+    <div class="stop s2">
+      <div class="rail"><div class="num">2</div></div>
+      <a class="cardlink" href="https://claude.ai/code/artifact/f147dc65-7335-4d0a-afb2-512242a3d0f9" target="_blank" rel="noopener">
+        <div class="ch"><span class="ct">에이전트 지도</span><span class="cstage">전체 지도</span></div>
+        <div class="cd">멀티 에이전트 4패턴(Graph·Swarm·Workflow·Agents-as-Tools), AgentCore 빌딩블록, Agent Loop 내부, Memory 동작을 탭으로.</div>
+        <div class="ctags"><span class="ctag">4 patterns</span><span class="ctag">AgentCore</span><span class="ctag">Memory</span></div>
+        <div class="cgo">열기 →</div>
+      </a>
+    </div>
+    <!-- 3 -->
+    <div class="stop s3">
+      <div class="rail"><div class="num">3</div></div>
+      <a class="cardlink" href="https://claude.ai/code/artifact/917ff76a-df07-4eb5-8ac5-190216938077" target="_blank" rel="noopener">
+        <div class="ch"><span class="ct">Agent 해부도</span><span class="cstage">내부 구조</span></div>
+        <div class="cd">단일 Agent를 분해 — 구성요소(Model·Tools·messages·Hooks·State), 한 턴의 content block 데이터 흐름, Hooks 생명주기.</div>
+        <div class="ctags"><span class="ctag">components</span><span class="ctag">Converse 포맷</span><span class="ctag">hooks</span></div>
+        <div class="cgo">열기 →</div>
+      </a>
+    </div>
+    <!-- 4 -->
+    <div class="stop s4">
+      <div class="rail"><div class="num">4</div></div>
+      <a class="cardlink" href="https://claude.ai/code/artifact/0c889720-2dfa-4528-91ba-eb5fd7a17ec5" target="_blank" rel="noopener">
+        <div class="ch"><span class="ct">프레임워크 비교</span><span class="cstage">비교</span></div>
+        <div class="cd">Strands vs LangGraph를 중심으로 CrewAI·OpenAI Agents·Google ADK까지. 철학·코드 대조·개념 매핑 매트릭스·선택 가이드.</div>
+        <div class="ctags"><span class="ctag">LangGraph</span><span class="ctag">CrewAI</span><span class="ctag">매핑 매트릭스</span></div>
+        <div class="cgo">열기 →</div>
+      </a>
+    </div>
+    <!-- 5 -->
+    <div class="stop s5">
+      <div class="rail"><div class="num">5</div></div>
+      <a class="cardlink" href="https://claude.ai/code/artifact/aaea0542-6e15-4325-bdd8-50055c5eb722" target="_blank" rel="noopener">
+        <div class="ch"><span class="ct">관측 & 평가</span><span class="cstage">프로덕션 · 믿는 법</span></div>
+        <div class="cd">루프를 트레이스 워터폴로 펼쳐 지연·토큰을 진단하고, 골든 테스트셋 + LLM-judge로 채점해 회귀를 잡는다.</div>
+        <div class="ctags"><span class="ctag">trace</span><span class="ctag">eval</span><span class="ctag">회귀 감지</span></div>
+        <div class="cgo">열기 →</div>
+      </a>
+    </div>
+    <!-- 6 -->
+    <div class="stop s6">
+      <div class="rail"><div class="num">6</div></div>
+      <a class="cardlink" href="https://claude.ai/code/artifact/6a3751c2-91c7-475c-b32f-146b927bf963" target="_blank" rel="noopener">
+        <div class="ch"><span class="ct">가드레일 & 보안</span><span class="cstage">프로덕션 · 안전</span></div>
+        <div class="cd">인증→입력 가드레일→훅 개입(HITL)→최소권한 툴→출력 가드레일→감사의 방어 계층. Bedrock Guardrails 6정책과 프롬프트 인젝션 위협모델.</div>
+        <div class="ctags"><span class="ctag">defense in depth</span><span class="ctag">PROMPT_ATTACK</span><span class="ctag">HITL</span></div>
+        <div class="cgo">열기 →</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="repo">
+    <div class="ct">🐍 samples/ — 돌아가는 파이썬 코드</div>
+    <div class="cd">위 개념들을 실제 Strands 코드로. 검증된 import·시그니처, <code>agentcore configure</code> → <code>launch</code> 배포 흐름, Swarm/Memory 심화 포함. (레포 안 <code>samples/</code> 폴더)</div>
+    <div class="files"><span>react_agent.py</span><span>graph_agent.py</span><span>swarm_agent.py</span><span>agents_as_tools.py</span><span>workflow_tool.py</span><span>agentcore_app.py</span><span>memory_example.py</span><span>gateway_mcp.py</span><span>README.md</span></div>
+  </div>
+
+  <div class="foot">
+    <div class="bar"></div>
+    <p><b>추천 동선</b> — 1→2로 큰 그림을 잡고, 3에서 안을 열어보고, 4로 다른 프레임워크와 견주고, 5·6으로 프로덕션 관문(믿음·안전)을 넘습니다. 모든 페이지는 2026-07 기준 공식 문서로 검증했고, 다이어그램의 수치·구성은 이해를 돕는 예시가 섞여 있습니다.</p>
+  </div>
+</div></div>
