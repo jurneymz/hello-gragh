@@ -1,0 +1,12 @@
+# Strands Agents core + community tools
+strands-agents
+strands-agents-tools
+
+# Bedrock AgentCore runtime SDK (BedrockAgentCoreApp, MemoryClient)
+bedrock-agentcore
+
+# Deploy CLI (starter toolkit) — provides the `agentcore` command
+bedrock-agentcore-starter-toolkit
+
+# MCP client transport (used by gateway_mcp.py)
+mcp

@@ -110,6 +110,9 @@
   .minilog li{opacity:0;animation:in .3s forwards;display:flex;gap:7px}
   .minilog li .step{color:var(--acc)}
   .minilog li.fin{color:var(--done);font-weight:600}
+  .api{font-family:var(--mono);font-size:10.5px;line-height:1.5;color:var(--muted);
+    padding:10px 16px;border-top:1px solid var(--line);background:var(--surface-2);white-space:pre-wrap;overflow-x:auto}
+  .api .k{color:var(--acc)} .api .c{opacity:.7}
 
   /* node/edge */
   .node rect{fill:var(--surface);stroke:var(--line-strong);stroke-width:1.5;transition:fill .2s,stroke .2s}
@@ -163,25 +166,39 @@
         <div class="mini-head"><span class="n">Graph</span><span class="chip">고정 DAG · 결정적</span></div>
         <div class="stage"><svg id="d-graph" viewBox="0 0 260 182" class="mini"></svg></div>
         <ul class="minilog" id="l-graph"></ul>
+        <div class="api"><span class="k">from</span> strands.multiagent <span class="k">import</span> GraphBuilder
+b.add_node(a,<span class="k">"x"</span>); b.add_edge(<span class="k">"x"</span>,<span class="k">"y"</span>)
+graph = b.build(); graph(task)  <span class="c"># GraphResult</span></div>
       </div>
       <div class="card" style="--acc:var(--sw)">
         <div class="mini-head"><span class="n">Swarm</span><span class="chip">자율 핸드오프</span></div>
         <div class="stage"><svg id="d-swarm" viewBox="0 0 260 182" class="mini"></svg></div>
         <ul class="minilog" id="l-swarm"></ul>
+        <div class="api"><span class="k">from</span> strands.multiagent <span class="k">import</span> Swarm
+Swarm([a, b, c])(task)
+<span class="c"># handoff_to_agent 툴 자동 주입 · 순차 핸드오프</span></div>
       </div>
       <div class="card" style="--acc:var(--wf)">
-        <div class="mini-head"><span class="n">Workflow</span><span class="chip">순차 파이프라인</span></div>
+        <div class="mini-head"><span class="n">Workflow</span><span class="chip">순차 파이프라인 · 툴</span></div>
         <div class="stage"><svg id="d-wf" viewBox="0 0 260 182" class="mini"></svg></div>
         <ul class="minilog" id="l-wf"></ul>
+        <div class="api"><span class="k">from</span> strands_tools <span class="k">import</span> workflow
+agent.tool.workflow(action=<span class="k">"create"</span>, tasks=[...])
+<span class="c"># 클래스 아님 — 툴(또는 Graph)로 구현</span></div>
       </div>
       <div class="card" style="--acc:var(--react)">
         <div class="mini-head"><span class="n">Agents-as-Tools</span><span class="chip">허브-스포크</span></div>
         <div class="stage"><svg id="d-tool" viewBox="0 0 260 182" class="mini"></svg></div>
         <ul class="minilog" id="l-tool"></ul>
+        <div class="api"><span class="k">@tool</span>
+<span class="k">def</span> sub(q): <span class="k">return</span> str(Agent(...)(q))
+Agent(tools=[sub])  <span class="c"># 에이전트를 툴처럼</span></div>
       </div>
     </div>
     <p class="cap" style="border:1px solid var(--line);border-radius:14px;margin-top:16px;background:var(--surface)">
       <b>고르는 기준</b> — 순서·검증이 중요하면 <b>Graph/Workflow</b>, 다음에 누가 일할지 모델이 판단하게 하려면 <b>Swarm</b>, 전문 에이전트를 기능처럼 불러 쓰려면 <b>Agents-as-Tools</b>.
+      <br><b>Swarm 심화</b> — 각 에이전트에 <code>handoff_to_agent</code> 툴이 자동으로 주입되고, 에이전트가 이를 호출해 <b>공유된 컨텍스트와 함께</b> 제어권을 넘깁니다. 현재는 <b>순차 핸드오프</b>(한 번에 하나)이며, <code>max_handoffs</code>·<code>max_iterations</code>로 상한을, 반복 핸드오프 감지(<code>repetitive_handoff_detection_window</code>)로 무한 핑퐁을 막습니다.
+      <br><span style="opacity:.7">위 코드 한 줄들은 2026-07 기준 실제 SDK 시그니처로 검증됨.</span>
     </p>
   </section>
 
