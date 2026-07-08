@@ -1,0 +1,323 @@
+<style>
+  :root{
+    --bg:#eef1f6;--grid:#d6dbe6;--surface:#ffffff;--surface-2:#f6f8fc;
+    --ink:#141a24;--muted:#5a6473;--line:#c9d0dc;--line-strong:#8b95a6;
+    --ac:#0c8ea3;--ac-soft:#c7ecf1;
+    --model:#2563eb;--model-soft:#d6e3ff;--tool:#d97a06;--tool-soft:#fbe6c2;--res:#2f9e44;--res-soft:#d3f0d8;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#0c0f16;--grid:#181e2a;--surface:#141a24;--surface-2:#0f141d;
+    --ink:#e7ebf3;--muted:#8c96a8;--line:#293241;--line-strong:#556173;
+    --ac:#3bd6e6;--ac-soft:#0d2e34;--model:#6ea8ff;--model-soft:#122447;
+    --tool:#f5a524;--tool-soft:#3a2c12;--res:#51cf66;--res-soft:#12321a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);}}
+  :root[data-theme="light"]{--bg:#eef1f6;--grid:#d6dbe6;--surface:#ffffff;--surface-2:#f6f8fc;
+    --ink:#141a24;--muted:#5a6473;--line:#c9d0dc;--line-strong:#8b95a6;--ac:#0c8ea3;--ac-soft:#c7ecf1;
+    --model:#2563eb;--model-soft:#d6e3ff;--tool:#d97a06;--tool-soft:#fbe6c2;--res:#2f9e44;--res-soft:#d3f0d8;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);}
+  :root[data-theme="dark"]{--bg:#0c0f16;--grid:#181e2a;--surface:#141a24;--surface-2:#0f141d;
+    --ink:#e7ebf3;--muted:#8c96a8;--line:#293241;--line-strong:#556173;--ac:#3bd6e6;--ac-soft:#0d2e34;
+    --model:#6ea8ff;--model-soft:#122447;--tool:#f5a524;--tool-soft:#3a2c12;--res:#51cf66;--res-soft:#12321a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);}
+  *{box-sizing:border-box}
+  .wrap{font-family:var(--sans);color:var(--ink);background:var(--bg);
+    background-image:radial-gradient(var(--grid) 1px,transparent 1px);background-size:22px 22px;
+    min-height:100vh;padding:clamp(20px,4vw,56px)}
+  .page{max-width:1040px;margin:0 auto}
+  header{margin-bottom:22px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong)}
+  h1{font-size:clamp(32px,6vw,54px);line-height:1;letter-spacing:-.03em;font-weight:800;margin:14px 0 0;text-wrap:balance}
+  .lede{max-width:64ch;margin:14px 0 0;color:var(--muted);font-size:clamp(15px,2vw,17px);line-height:1.55}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 20px;position:sticky;top:0;z-index:5;padding:10px 0;background:linear-gradient(var(--bg) 70%,transparent)}
+  .tab{font-family:var(--mono);font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--surface);
+    color:var(--muted);padding:9px 15px;border-radius:10px;box-shadow:var(--shadow);display:flex;gap:8px;align-items:center;transition:color .15s,border-color .15s}
+  .tab .idx{opacity:.5}
+  .tab[aria-selected="true"]{color:var(--ink);border-color:var(--ac);font-weight:600}
+  .tab:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+  section.panel{display:none} section.panel.on{display:block;animation:fade .3s}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .s-head{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+  .s-head .txt{flex:1;min-width:240px}
+  .s-title{font-size:24px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px}
+  .s-sub{font-size:14px;color:var(--muted);line-height:1.5;max-width:70ch}
+  button.run{font-family:var(--mono);font-size:13px;cursor:pointer;border:1px solid var(--ink);background:var(--ink);
+    color:var(--bg);padding:11px 18px;border-radius:10px;box-shadow:var(--shadow);font-weight:600;white-space:nowrap;transition:transform .12s}
+  button.run:hover{transform:translateY(-1px)} button.run:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  button.run:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+  /* anatomy */
+  .anat{display:grid;grid-template-columns:1.35fr 1fr;gap:20px;align-items:start}
+  @media(max-width:780px){.anat{grid-template-columns:1fr}}
+  .agentbox{position:relative;border:2px dashed var(--ac);border-radius:18px;padding:26px 16px 16px;background:var(--surface)}
+  .agentbox .blabel{position:absolute;top:-11px;left:16px;background:var(--bg);padding:0 8px;font-family:var(--mono);font-size:12px;color:var(--ac);font-weight:700}
+  .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:480px){.chips{grid-template-columns:repeat(2,1fr)}}
+  .chip{cursor:pointer;text-align:left;border:1.5px solid var(--line);background:var(--surface-2);border-radius:11px;
+    padding:11px 12px;transition:border-color .15s,background .15s,transform .1s;font-family:inherit;color:var(--ink)}
+  .chip:hover{transform:translateY(-1px)}
+  .chip:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+  .chip .nm{font-size:13.5px;font-weight:700}
+  .chip .sb{font-family:var(--mono);font-size:9.5px;letter-spacing:.03em;color:var(--muted);margin-top:2px;text-transform:uppercase}
+  .chip[aria-pressed="true"]{border-color:var(--ac);background:var(--ac-soft)}
+  .chip.center{border-style:solid;border-color:var(--model)}
+  .chip.center .sb{color:var(--model)}
+  .chip.center[aria-pressed="true"]{background:var(--model-soft);border-color:var(--model)}
+  .detail{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--ac);border-radius:14px;
+    box-shadow:var(--shadow);padding:18px 20px;position:sticky;top:64px}
+  .detail .dn{font-size:18px;font-weight:800;margin-bottom:2px}
+  .detail .dr{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+  .detail pre{margin:0 0 10px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:11px 13px;
+    overflow-x:auto;font-family:var(--mono);font-size:11.5px;line-height:1.55;white-space:pre}
+  .detail ul{margin:0;padding-left:17px;font-size:13px;line-height:1.6;color:var(--muted)}
+  .detail ul b{color:var(--ink)} .detail code{font-family:var(--mono);font-size:.9em;background:var(--surface-2);padding:1px 4px;border-radius:4px}
+  .kw{color:var(--model)} .st{color:var(--res)} .cm{color:var(--muted)} .fn{color:var(--tool)}
+  .note{font-size:12.5px;color:var(--muted);margin-top:14px;padding:11px 13px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;line-height:1.5}
+  .note b{color:var(--ink)}
+
+  /* data flow */
+  .flow-wrap{display:grid;grid-template-columns:1fr 260px;gap:20px;align-items:start}
+  @media(max-width:780px){.flow-wrap{grid-template-columns:1fr}}
+  .msgs{display:flex;flex-direction:column;gap:10px;min-height:200px}
+  .divider{font-family:var(--mono);font-size:11px;color:var(--ac);display:flex;align-items:center;gap:10px;margin:4px 0;opacity:0;animation:in .3s forwards}
+  .divider::before,.divider::after{content:"";height:1px;background:var(--ac);opacity:.4;flex:1}
+  .msg{border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);opacity:0;transform:translateY(6px);animation:in .35s forwards}
+  @keyframes in{to{opacity:1;transform:none}}
+  .msg .role{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;font-weight:700}
+  .msg.user .role{background:var(--surface-2);color:var(--muted)}
+  .msg.assistant .role{background:var(--model-soft);color:var(--model)}
+  .msg .blocks{padding:10px 12px;display:flex;flex-direction:column;gap:7px;background:var(--surface)}
+  .block{font-family:var(--mono);font-size:11.5px;line-height:1.5;border-radius:8px;padding:8px 10px;border:1px solid var(--line)}
+  .block .bt{font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:700;margin-bottom:3px;display:block}
+  .block.text{background:var(--surface-2)} .block.text .bt{color:var(--muted)}
+  .block.tooluse{background:var(--tool-soft);border-color:var(--tool)} .block.tooluse .bt{color:var(--tool)}
+  .block.toolresult{background:var(--res-soft);border-color:var(--res)} .block.toolresult .bt{color:var(--res)}
+  .sidebox{background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow);padding:15px 16px;position:sticky;top:64px}
+  .sidebox h4{margin:0 0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .sidebox p{margin:0 0 10px;font-size:12.5px;line-height:1.55;color:var(--muted)} .sidebox b{color:var(--ink)}
+  .legend{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:7px} .sw{width:11px;height:11px;border-radius:3px;flex:none}
+
+  /* hooks timeline */
+  .tl{display:flex;flex-direction:column;gap:0;position:relative}
+  .tl-item{display:grid;grid-template-columns:20px 1fr;gap:14px;padding:0 0 16px}
+  .tl-dot{position:relative;display:flex;justify-content:center}
+  .tl-dot i{width:13px;height:13px;border-radius:50%;background:var(--surface);border:2px solid var(--line-strong);z-index:1;margin-top:3px;transition:background .2s,border-color .2s}
+  .tl-dot::before{content:"";position:absolute;top:3px;bottom:-16px;width:2px;background:var(--line)}
+  .tl-item:last-child .tl-dot::before{display:none}
+  .tl-item.lit .tl-dot i{background:var(--ac);border-color:var(--ac)}
+  .tl-item.loop .tl-dot i{border-color:var(--tool)}
+  .tl-item.lit.loop .tl-dot i{background:var(--tool);border-color:var(--tool)}
+  .tl-card{border:1px solid var(--line);border-radius:11px;padding:11px 14px;background:var(--surface);box-shadow:var(--shadow);transition:border-color .2s,opacity .2s;opacity:.55}
+  .tl-item.lit .tl-card{opacity:1;border-color:var(--ac)}
+  .tl-item.lit.loop .tl-card{border-color:var(--tool)}
+  .tl-card .ev{font-family:var(--mono);font-size:13px;font-weight:700}
+  .tl-card .wn{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.45}
+  .tl-card .inj{font-size:12px;margin-top:6px;color:var(--ink)}
+  .tl-card .inj b{color:var(--ac)}
+  .loopbadge{font-family:var(--mono);font-size:9.5px;color:var(--tool);border:1px solid var(--tool);border-radius:20px;padding:0 7px;margin-left:8px}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px}
+  .foot{margin-top:30px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:16px;align-items:flex-start}
+  .foot .bar{width:3px;align-self:stretch;background:linear-gradient(var(--model),var(--ac),var(--tool));border-radius:3px;flex:none}
+  .foot p{margin:0;font-size:14px;line-height:1.55;color:var(--muted)} .foot b{color:var(--ink)}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
+</style>
+
+<div class="wrap"><div class="page">
+  <header>
+    <div class="eyebrow"><span>Strands Agents</span><span class="dot"></span><span>Agent 내부</span><span class="dot"></span><span>검증 2026-07</span></div>
+    <h1>Agent, 분해해서 보기</h1>
+    <p class="lede">지금까지 에이전트를 <b>바깥에서</b> 봤다면, 이제 <code>Agent(...)</code> 하나를 <b>열어서</b> 안에 뭐가 들었는지 봅니다 — 구성요소, 한 턴의 실제 데이터, 그리고 생명주기 개입점.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-t="p1" aria-selected="true"><span class="idx">01</span> 구성요소</button>
+    <button class="tab" role="tab" data-t="p2" aria-selected="false"><span class="idx">02</span> 한 턴의 데이터</button>
+    <button class="tab" role="tab" data-t="p3" aria-selected="false"><span class="idx">03</span> Hooks 생명주기</button>
+  </div>
+
+  <!-- P1 ANATOMY -->
+  <section class="panel on" id="p1">
+    <div class="s-head"><div class="txt">
+      <div class="s-title">Agent를 이루는 부품들</div>
+      <div class="s-sub">각 블록은 <code>Agent(...)</code> 생성자 파라미터에 대응합니다. 클릭해서 역할·API를 확인하세요.</div>
+    </div></div>
+    <div class="anat">
+      <div class="agentbox">
+        <span class="blabel">Agent( … )</span>
+        <div class="chips" id="chips"></div>
+        <div class="note">이 밖에도 <code>callback_handler</code>(스트리밍 이벤트) · <code>structured_output_model</code>(Pydantic 타입 출력) · <code>tool_executor</code> · <code>retry_strategy</code> 등 최신 SDK엔 파라미터가 더 많습니다.</div>
+      </div>
+      <div class="detail" id="detail"></div>
+    </div>
+  </section>
+
+  <!-- P2 DATA -->
+  <section class="panel" id="p2">
+    <div class="s-head">
+      <div class="txt">
+        <div class="s-title">한 턴 동안 <code>messages</code>가 자라는 모습</div>
+        <div class="s-sub">"서울 날씨?" 한 마디가 어떻게 <b>content block</b>(text / toolUse / toolResult)으로 쌓이는지. 이게 Bedrock <b>Converse</b> 포맷입니다.</div>
+      </div>
+      <button class="run" data-run="p2">▶ 한 턴 실행</button>
+    </div>
+    <div class="flow-wrap">
+      <div class="msgs" id="msgs"></div>
+      <div class="sidebox">
+        <h4>매 모델 호출마다 전송</h4>
+        <p><b>system prompt</b> + <b>전체 messages</b> + <b>tool 스펙</b>. 루프가 돌수록 messages가 누적되어 매번 통째로 다시 전송됩니다 — 그래서 컨텍스트 관리·캐싱이 중요.</p>
+        <h4>content block</h4>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--line-strong)"></i>text — 일반 텍스트</span>
+          <span><i class="sw" style="background:var(--tool)"></i>toolUse — 툴 호출(id·name·input)</span>
+          <span><i class="sw" style="background:var(--res)"></i>toolResult — 결과 되먹임</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- P3 HOOKS -->
+  <section class="panel" id="p3">
+    <div class="s-head">
+      <div class="txt">
+        <div class="s-title">Hooks — 루프 곳곳에 손을 넣는 지점</div>
+        <div class="s-sub">에이전트 생명주기의 정해진 순간마다 이벤트가 발생합니다. 여기에 콜백을 걸어 <b>가드레일·로깅·승인·마스킹</b>을 끼웁니다. <code>from strands.hooks import ...</code></div>
+      </div>
+      <button class="run" data-run="p3">▶ 순서대로 발생</button>
+    </div>
+    <div class="card">
+      <div class="tl" id="tl"></div>
+      <div class="note" style="margin-top:16px"><b>등록</b> — <code>HookProvider.register_hooks(registry)</code> 안에서 <code>registry.add_callback(BeforeToolCallEvent, fn)</code>, 또는 간단히 <code>agent.add_hook(fn, BeforeToolCallEvent)</code>. (구 <code>...InvocationEvent</code> 이름은 레거시 → 현재는 <code>ToolCall/ModelCall</code>)</div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="bar"></div>
+    <p><b>정리</b> — Agent는 <b>Model·Tools·messages·Conversation Manager·Event Loop·Hooks·State/Session</b>의 조합입니다. 대부분은 프레임워크가 관리하고, 우리는 <b>툴을 얹고 hook으로 개입</b>할 뿐. 이 구조를 알면 프롬프트가 실제로 뭘 받고, 어디서 끼어들 수 있는지가 보입니다.</p>
+  </div>
+</div></div>
+
+<script>
+(function(){
+  const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const wait=ms=>new Promise(r=>setTimeout(r,reduce?10:ms));
+
+  // ---------- P1 anatomy ----------
+  const comps=[
+    {id:"model",nm:"Model",sb:"프로바이더",role:"LLM 프로바이더 추상화. 어떤 모델이든 같은 인터페이스로.",
+     code:'<span class="kw">from</span> strands.models <span class="kw">import</span> BedrockModel\nAgent(model=BedrockModel(\n  model_id=<span class="st">"...claude-sonnet-4..."</span>,\n  region_name=<span class="st">"us-west-2"</span>, temperature=<span class="st">0.3</span>))',
+     pts:["기본값: <b>BedrockModel</b> (Claude Sonnet 4)","Anthropic·OpenAI·LiteLLM·Ollama·Nova·Gemini 등 교체 가능","문자열 model-id 또는 인스턴스로 전달"]},
+    {id:"sys",nm:"System Prompt",sb:"역할 지시",role:"에이전트의 정체성·규칙을 정하는 시스템 지시.",
+     code:'Agent(system_prompt=<span class="st">"너는 여행 도우미다..."</span>)\n<span class="cm"># 또는 list[SystemContentBlock] — 캐싱 등 지원</span>',
+     pts:["<code>str</code> 또는 <code>list[SystemContentBlock]</code>","매 모델 호출마다 함께 전송됨"]},
+    {id:"tools",nm:"Tools · Registry",sb:"능력",role:"에이전트가 부를 수 있는 함수들. 데코레이터가 스키마를 자동 생성.",
+     code:'<span class="kw">@tool</span>\n<span class="kw">def</span> <span class="fn">weather</span>(city: str) -> str:\n    <span class="st">"""도시 날씨를 반환."""</span>\n    ...\nAgent(tools=[weather])\nagent.tool.<span class="fn">weather</span>(city=<span class="st">"서울"</span>)  <span class="cm"># 직접 호출</span>',
+     pts:["<code>@tool</code>가 name·description·<code>inputSchema.json</code> 자동 생성","<b>ToolRegistry</b>가 등록·검증·탐색 담당","툴은 <b>기본 병렬 실행</b> (tool_executor로 순차 전환)"]},
+    {id:"loop",nm:"Event Loop",sb:"오케스트레이션",center:true,role:"핵심 엔진. 모델 추론 → toolUse 감지 → 툴 실행 → toolResult 추가 → 반복. 더 부를 툴이 없으면 종료.",
+     code:'agent(<span class="st">"..."</span>)                <span class="cm"># 동기</span>\n<span class="kw">await</span> agent.invoke_async(<span class="st">"..."</span>)\n<span class="kw">async for</span> e <span class="kw">in</span> agent.stream_async(<span class="st">"..."</span>): ...\nagent(<span class="st">"..."</span>, limits={<span class="st">"turns"</span>:5})',
+     pts:["종료 사유: <code>end_turn</code> · <code>limit_turns</code> · <code>limit_*_tokens</code>","툴 에러는 예외 대신 결과로 되먹여 모델이 복구","반복 횟수는 <b>모델이 결정</b> (비결정적)"]},
+    {id:"conv",nm:"Conversation Manager",sb:"컨텍스트 관리",role:"컨텍스트 윈도우가 넘칠 때 히스토리를 어떻게 다룰지 정하는 전략.",
+     code:'<span class="kw">from</span> strands.agent.conversation_manager <span class="kw">import</span> (\n  SlidingWindowConversationManager,\n  SummarizingConversationManager, NullConversationManager)',
+     pts:["<b>SlidingWindow</b> (기본): 최근 N개 유지 (<code>window_size</code>)","<b>Summarizing</b>: 오래된 건 요약 (<code>summary_ratio</code>, <code>preserve_recent_messages</code>)","<b>Null</b>: 손대지 않음"]},
+    {id:"msgs",nm:"messages",sb:"대화 상태",role:"대화 히스토리. Bedrock Converse 포맷의 메시지 리스트 — 모델이 보는 컨텍스트.",
+     code:'[{<span class="st">"role"</span>:<span class="st">"user"</span>, <span class="st">"content"</span>:[{<span class="st">"text"</span>:<span class="st">"..."</span>}]},\n {<span class="st">"role"</span>:<span class="st">"assistant"</span>, <span class="st">"content"</span>:[{<span class="st">"toolUse"</span>:{...}}]},\n {<span class="st">"role"</span>:<span class="st">"user"</span>, <span class="st">"content"</span>:[{<span class="st">"toolResult"</span>:{...}}]}]',
+     pts:["block 종류: <code>text</code> · <code>toolUse</code> · <code>toolResult</code>","<code>Agent(messages=[...])</code>로 초기 히스토리 주입","→ 자세히는 탭 02"]},
+    {id:"hooks",nm:"Hooks",sb:"생명주기 개입",role:"루프의 정해진 순간에 콜백을 거는 확장점 — 가드레일·로깅·승인.",
+     code:'<span class="kw">from</span> strands.hooks <span class="kw">import</span> BeforeToolCallEvent\nagent.add_hook(check_fn, BeforeToolCallEvent)',
+     pts:["이벤트: Before/After Invocation·ModelCall·ToolCall, MessageAdded","→ 자세히는 탭 03"]},
+    {id:"state",nm:"State",sb:"대화 밖 저장",role:"모델이 보지 않는 key-value 저장소. 대화 히스토리와 분리된 앱 상태.",
+     code:'agent = Agent(state={<span class="st">"theme"</span>:<span class="st">"dark"</span>})\nagent.state.get(<span class="st">"theme"</span>)\nagent.state.set(<span class="st">"count"</span>, 1)',
+     pts:["<b>모델에 전송되지 않음</b> (messages와 대비)","JSON 직렬화 가능한 값만","툴 안에선 <code>ToolContext</code>로 접근"]},
+    {id:"session",nm:"Session",sb:"영속화",role:"상태·히스토리를 저장소에 자동 저장/복원해 세션을 이어감.",
+     code:'<span class="kw">from</span> strands.session.file_session_manager <span class="kw">import</span> FileSessionManager\nAgent(session_manager=FileSessionManager(\n  session_id=<span class="st">"user-123"</span>))',
+     pts:["<b>FileSessionManager</b> / <b>S3SessionManager</b>","init 시 상태+히스토리 자동 복원","메시지·호출마다 자동 영속"]},
+  ];
+  const chipsEl=document.getElementById("chips"), detailEl=document.getElementById("detail");
+  comps.forEach(c=>{
+    const b=document.createElement("button");
+    b.className="chip"+(c.center?" center":"");b.setAttribute("aria-pressed","false");b.dataset.id=c.id;
+    b.innerHTML=`<div class="nm">${c.nm}</div><div class="sb">${c.sb}</div>`;
+    b.addEventListener("click",()=>select(c.id));
+    chipsEl.appendChild(b);
+  });
+  function select(id){
+    const c=comps.find(x=>x.id===id);
+    document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x.dataset.id===id?"true":"false"));
+    detailEl.innerHTML=`<div class="dn">${c.nm}</div><div class="dr">${c.role}</div>`+
+      `<pre>${c.code}</pre><ul>${c.pts.map(p=>`<li>${p}</li>`).join("")}</ul>`;
+  }
+  select("loop");
+
+  // ---------- P2 data flow ----------
+  const msgsEl=document.getElementById("msgs");
+  const steps=[
+    {type:"msg",role:"user",blocks:[{k:"text",t:"text",c:'"서울 날씨 어때?"'}]},
+    {type:"div",t:"① 모델 호출 #1 — 전송: system + messages(1) + tools"},
+    {type:"msg",role:"assistant",blocks:[{k:"tooluse",t:"toolUse",c:'name: get_weather\ninput: { "city": "서울" }\ntoolUseId: "tu_01"'}]},
+    {type:"msg",role:"user",blocks:[{k:"toolresult",t:"toolResult",c:'toolUseId: "tu_01"  status: success\ncontent: [{ text: "맑음, 22°C" }]'}]},
+    {type:"div",t:"② 모델 호출 #2 — 전송: system + messages(3) + tools"},
+    {type:"msg",role:"assistant",blocks:[{k:"text",t:"text",c:'"서울은 지금 맑고 22도예요."'}]},
+    {type:"div",t:"✓ stop_reason: end_turn — toolUse 없음 → 루프 종료"},
+  ];
+  function renderStep(s){
+    if(s.type==="div"){const d=document.createElement("div");d.className="divider";d.textContent=s.t;msgsEl.appendChild(d);return;}
+    const m=document.createElement("div");m.className="msg "+s.role;
+    m.innerHTML=`<div class="role">${s.role}</div><div class="blocks">`+
+      s.blocks.map(b=>`<div class="block ${b.k}"><span class="bt">${b.t}</span>${b.c}</div>`).join("")+`</div>`;
+    msgsEl.appendChild(m);
+  }
+  async function runData(){
+    msgsEl.innerHTML="";
+    for(const s of steps){renderStep(s);await wait(s.type==="div"?520:760);}
+  }
+  // show first message initially
+  renderStep(steps[0]);
+
+  // ---------- P3 hooks ----------
+  const hooks=[
+    {ev:"AgentInitializedEvent",wn:"에이전트 생성 직후 (1회)",inj:"초기 설정·리소스 준비"},
+    {ev:"BeforeInvocationEvent",wn:"요청 처리 시작",inj:"요청 로깅·인증·타이머 시작"},
+    {ev:"BeforeModelCallEvent",wn:"모델 호출 직전",inj:"<b>가드레일·프롬프트 가공</b>",loop:true},
+    {ev:"AfterModelCallEvent",wn:"모델 응답 직후",inj:"응답 검사·토큰 집계",loop:true},
+    {ev:"BeforeToolCallEvent",wn:"툴 실행 직전",inj:"<b>인자 검증·사람 승인(HITL)</b>",loop:true},
+    {ev:"AfterToolCallEvent",wn:"툴 실행 직후",inj:"결과 필터·에러 처리",loop:true},
+    {ev:"MessageAddedEvent",wn:"메시지가 히스토리에 추가될 때",inj:"<b>민감정보 마스킹</b>",loop:true},
+    {ev:"AfterInvocationEvent",wn:"요청 처리 종료",inj:"정리·집계·최종 로깅"},
+  ];
+  const tlEl=document.getElementById("tl");
+  hooks.forEach(h=>{
+    const it=document.createElement("div");it.className="tl-item"+(h.loop?" loop":"");
+    it.innerHTML=`<div class="tl-dot"><i></i></div><div class="tl-card">`+
+      `<div class="ev">${h.ev}${h.loop?'<span class="loopbadge">루프마다</span>':''}</div>`+
+      `<div class="wn">${h.wn}</div><div class="inj">개입 예: ${h.inj}</div></div>`;
+    tlEl.appendChild(it);
+  });
+  async function runHooks(){
+    const items=[...tlEl.children];items.forEach(i=>i.classList.remove("lit"));
+    for(const i of items){i.classList.add("lit");await wait(420);}
+  }
+
+  // tabs + run
+  document.querySelectorAll(".tab").forEach(tb=>{
+    tb.addEventListener("click",()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected","false"));
+      tb.setAttribute("aria-selected","true");
+      document.querySelectorAll("section.panel").forEach(s=>s.classList.remove("on"));
+      document.getElementById(tb.dataset.t).classList.add("on");
+    });
+  });
+  const busy={};
+  document.querySelectorAll("button.run").forEach(btn=>{
+    btn.addEventListener("click",async()=>{
+      const k=btn.dataset.run;if(busy[k])return;busy[k]=true;btn.disabled=true;
+      await (k==="p2"?runData():runHooks());
+      busy[k]=false;btn.disabled=false;
+    });
+  });
+})();
+</script>
