@@ -1,0 +1,335 @@
+<style>
+  :root{
+    --bg:#eef1f6;--grid:#d6dbe6;--surface:#ffffff;--surface-2:#f6f8fc;
+    --ink:#141a24;--muted:#5a6473;--line:#c9d0dc;--line-strong:#8b95a6;
+    --strands:#d97a06;--strands-soft:#fbe6c2;
+    --lg:#5b54d6;--lg-soft:#e2e0fb;
+    --ok:#2f9e44;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#0c0f16;--grid:#181e2a;--surface:#141a24;--surface-2:#0f141d;
+    --ink:#e7ebf3;--muted:#8c96a8;--line:#293241;--line-strong:#556173;
+    --strands:#f5a524;--strands-soft:#3a2c12;--lg:#9d97ff;--lg-soft:#211f45;--ok:#51cf66;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);}}
+  :root[data-theme="light"]{--bg:#eef1f6;--grid:#d6dbe6;--surface:#ffffff;--surface-2:#f6f8fc;
+    --ink:#141a24;--muted:#5a6473;--line:#c9d0dc;--line-strong:#8b95a6;
+    --strands:#d97a06;--strands-soft:#fbe6c2;--lg:#5b54d6;--lg-soft:#e2e0fb;--ok:#2f9e44;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);}
+  :root[data-theme="dark"]{--bg:#0c0f16;--grid:#181e2a;--surface:#141a24;--surface-2:#0f141d;
+    --ink:#e7ebf3;--muted:#8c96a8;--line:#293241;--line-strong:#556173;
+    --strands:#f5a524;--strands-soft:#3a2c12;--lg:#9d97ff;--lg-soft:#211f45;--ok:#51cf66;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);}
+  *{box-sizing:border-box}
+  .wrap{font-family:var(--sans);color:var(--ink);background:var(--bg);
+    background-image:radial-gradient(var(--grid) 1px,transparent 1px);background-size:22px 22px;
+    min-height:100vh;padding:clamp(20px,4vw,56px)}
+  .page{max-width:1040px;margin:0 auto}
+  header{margin-bottom:22px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--muted);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong)}
+  h1{font-size:clamp(30px,5.5vw,52px);line-height:1.02;letter-spacing:-.03em;font-weight:800;margin:14px 0 0;text-wrap:balance}
+  h1 .s{color:var(--strands)} h1 .l{color:var(--lg)} h1 .vs{color:var(--muted);font-weight:400}
+  .lede{max-width:64ch;margin:14px 0 0;color:var(--muted);font-size:clamp(15px,2vw,17px);line-height:1.55}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0 20px;position:sticky;top:0;z-index:5;
+    padding:10px 0;background:linear-gradient(var(--bg) 70%,transparent)}
+  .tab{font-family:var(--mono);font-size:13px;cursor:pointer;border:1px solid var(--line);
+    background:var(--surface);color:var(--muted);padding:9px 15px;border-radius:10px;box-shadow:var(--shadow);
+    display:flex;gap:8px;align-items:center;transition:color .15s,border-color .15s}
+  .tab .idx{opacity:.5}
+  .tab[aria-selected="true"]{color:var(--ink);border-color:var(--ink);font-weight:600}
+  .tab:focus-visible{outline:2px solid var(--lg);outline-offset:2px}
+  section.panel{display:none} section.panel.on{display:block;animation:fade .3s}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+  .s-title{font-size:24px;font-weight:800;letter-spacing:-.01em;margin:0 0 4px}
+  .s-sub{font-size:14px;color:var(--muted);line-height:1.5;max-width:70ch;margin-bottom:18px}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    overflow:hidden;border-top:3px solid var(--acc);display:flex;flex-direction:column}
+  .card.strands{--acc:var(--strands)} .card.lg{--acc:var(--lg)}
+  .card .hd{padding:16px 18px 10px}
+  .card .hd .nm{font-size:19px;font-weight:800}
+  .card .hd .ph{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--acc);margin-top:2px}
+  .stage{background:var(--surface-2);padding:6px 6px 2px;display:flex;justify-content:center}
+  svg{width:100%;height:auto;max-width:320px}
+  ul.pts{margin:0;padding:14px 20px 18px;list-style:none;display:flex;flex-direction:column;gap:9px;font-size:13.5px;line-height:1.5}
+  ul.pts li{display:flex;gap:9px} ul.pts li::before{content:"—";color:var(--acc);flex:none}
+  ul.pts b{color:var(--ink)}
+
+  .node{fill:var(--surface);stroke:var(--line-strong);stroke-width:1.5}
+  .node.acc{fill:var(--acc-soft,var(--surface));stroke:var(--acc);stroke-width:2}
+  .nlab{fill:var(--ink);font-family:var(--sans);font-weight:700;font-size:12px}
+  .nsub{fill:var(--muted);font-family:var(--mono);font-size:8px;letter-spacing:.04em}
+  .ed{stroke:var(--acc);stroke-width:2;fill:none;opacity:.9}
+  .flow{stroke-dasharray:5 4;animation:dash 1.1s linear infinite}
+  @keyframes dash{to{stroke-dashoffset:-18}}
+  .statebar{fill:var(--acc);opacity:.14} .statelab{fill:var(--acc);font-family:var(--mono);font-size:8.5px;font-weight:600}
+  .capt{fill:var(--muted);font-family:var(--mono);font-size:8.5px}
+
+  pre{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+    overflow-x:auto;font-family:var(--mono);font-size:12px;line-height:1.55;border-top:3px solid var(--acc);height:100%}
+  pre.strands{--acc:var(--strands)} pre.lg{--acc:var(--lg)}
+  pre .h{display:flex;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--line);color:var(--acc);font-weight:700;letter-spacing:.02em}
+  pre .h small{color:var(--muted);font-weight:400}
+  pre code.blk{display:block;padding:14px 16px;white-space:pre}
+  .kw{color:var(--lg)} .st{color:var(--ok)} .cm{color:var(--muted)} .fn{color:var(--strands)}
+  .codenote{font-size:13px;color:var(--muted);line-height:1.5;margin:16px 0 0;padding:13px 16px;
+    background:var(--surface-2);border:1px solid var(--line);border-radius:11px}
+  .codenote b{color:var(--ink)}
+  h3.sec{font-size:13px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:26px 0 12px}
+
+  .tbl-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);background:var(--surface)}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:760px}
+  th,td{text-align:left;padding:11px 13px;border-bottom:1px solid var(--line);border-right:1px solid var(--line);vertical-align:top;line-height:1.45}
+  th:last-child,td:last-child{border-right:none} tr:last-child td{border-bottom:none}
+  thead th{font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;background:var(--surface-2)}
+  thead th.strands{color:var(--strands)} thead th.lg{color:var(--lg)}
+  td:first-child,th:first-child{font-weight:700;color:var(--ink);white-space:nowrap;background:var(--surface-2)}
+  td code{font-family:var(--mono);font-size:11px;background:var(--surface-2);padding:1px 4px;border-radius:4px}
+
+  .guide{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.guide{grid-template-columns:1fr}}
+  .gcard{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+  .gcard .nm{font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px}
+  .gcard .tag{font-family:var(--mono);font-size:10px;color:var(--acc);border:1px solid var(--acc);border-radius:20px;padding:1px 8px}
+  .gcard p{margin:8px 0 0;font-size:13.5px;color:var(--muted);line-height:1.55}
+  .gcard p b{color:var(--ink)}
+  .gcard.g-strands{--acc:var(--strands)} .gcard.g-lg{--acc:var(--lg)}
+  .gcard.g-crew{--acc:#e8590c} .gcard.g-oai{--acc:#0b8a6b} .gcard.g-adk{--acc:#3b6fe0}
+
+  .caveat{margin-top:22px;padding:15px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+  .caveat h4{margin:0 0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .caveat ul{margin:0;padding-left:18px;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .caveat b{color:var(--ink)}
+
+  .foot{margin-top:30px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:16px;align-items:flex-start}
+  .foot .bar{width:3px;align-self:stretch;background:linear-gradient(var(--strands),var(--lg));border-radius:3px;flex:none}
+  .foot p{margin:0;font-size:14px;line-height:1.55;color:var(--muted)} .foot b{color:var(--ink)}
+  @media(prefers-reduced-motion:reduce){.flow{animation:none}*{animation-duration:.01ms!important}}
+</style>
+
+<div class="wrap"><div class="page">
+  <header>
+    <div class="eyebrow"><span>Agent Frameworks</span><span class="dot"></span><span>비교</span><span class="dot"></span><span>검증 2026-07</span></div>
+    <h1><span class="s">Strands</span> <span class="vs">vs</span> <span class="l">LangGraph</span> <span class="vs">— 그리고 그 밖의 것들</span></h1>
+    <p class="lede">핵심 갈림길은 하나입니다: <b>모델이 루프를 결정</b>하게 둘 것인가(Strands 단일 Agent), 아니면 <b>개발자가 상태 그래프를 명시</b>할 것인가(LangGraph). 재밌게도 Strands는 둘 다 제공합니다.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-t="p1" aria-selected="true"><span class="idx">01</span> 두 철학</button>
+    <button class="tab" role="tab" data-t="p2" aria-selected="false"><span class="idx">02</span> 같은 걸, 두 코드</button>
+    <button class="tab" role="tab" data-t="p3" aria-selected="false"><span class="idx">03</span> 비교 매트릭스</button>
+    <button class="tab" role="tab" data-t="p4" aria-selected="false"><span class="idx">04</span> 선택 가이드</button>
+  </div>
+
+  <!-- P1 -->
+  <section class="panel on" id="p1">
+    <h2 class="s-title">모델이 결정하나, 개발자가 그리나</h2>
+    <p class="s-sub">같은 ReAct 작업이라도 프레임워크의 <b>기본 추상화 레벨</b>이 다릅니다. 왼쪽은 루프를 모델에 맡기고(고수준), 오른쪽은 노드·엣지·상태를 손으로 배선합니다(저수준·명시적).</p>
+    <div class="two">
+      <div class="card strands">
+        <div class="hd"><div class="nm">Strands — Agentic Loop</div><div class="ph">model-driven · 고수준</div></div>
+        <div class="stage">
+          <svg viewBox="0 0 300 210" role="img" aria-label="Strands 모델 주도 루프">
+            <defs><marker id="as" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--strands)"/></marker></defs>
+            <g style="--acc:var(--strands);--acc-soft:var(--strands-soft)">
+              <path class="ed flow" d="M150,44 L150,66" marker-end="url(#as)"/>
+              <path class="ed flow" d="M124,104 C96,120 96,150 122,164" marker-end="url(#as)"/>
+              <path class="ed flow" d="M176,164 C204,150 204,120 178,104" marker-end="url(#as)"/>
+              <path class="ed flow" d="M188,86 L246,86" marker-end="url(#as)"/>
+              <rect class="node" x="112" y="26" width="76" height="20" rx="6"/>
+              <text class="nlab" x="150" y="40" text-anchor="middle">입력</text>
+              <rect class="node acc" x="106" y="66" width="88" height="40" rx="10"/>
+              <text class="nlab" x="150" y="83" text-anchor="middle">Model</text>
+              <text class="nsub" x="150" y="97" text-anchor="middle">다음 스텝 판단</text>
+              <rect class="node" x="112" y="164" width="76" height="34" rx="9"/>
+              <text class="nlab" x="150" y="180" text-anchor="middle">Tools</text>
+              <text class="nsub" x="150" y="192" text-anchor="middle">실행</text>
+              <rect class="node acc" x="246" y="70" width="48" height="32" rx="9"/>
+              <text class="nlab" x="270" y="90" text-anchor="middle">응답</text>
+              <text class="capt" x="150" y="14" text-anchor="middle">반복 횟수·경로 = 모델이 런타임에 결정</text>
+            </g>
+          </svg>
+        </div>
+        <ul class="pts">
+          <li><b>개발자는 툴만 준다.</b> reason→act→observe 루프는 모델이 자율적으로 돈다.</li>
+          <li><b>비결정적 경로</b> — 실행마다 다를 수 있음. 개방형 작업에 강함.</li>
+          <li>더 구조가 필요하면 <code>GraphBuilder</code>(결정적 DAG)·<code>Swarm</code>으로 확장.</li>
+          <li>비슷한 계열: <b>OpenAI Agents SDK</b>(handoff 중심의 얇은 루프).</li>
+        </ul>
+      </div>
+      <div class="card lg">
+        <div class="hd"><div class="nm">LangGraph — State Graph</div><div class="ph">developer-defined · 저수준</div></div>
+        <div class="stage">
+          <svg viewBox="0 0 300 210" role="img" aria-label="LangGraph 상태 그래프">
+            <defs><marker id="al" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--lg)"/></marker></defs>
+            <g style="--acc:var(--lg);--acc-soft:var(--lg-soft)">
+              <path class="ed flow" d="M74,52 L104,52" marker-end="url(#al)"/>
+              <path class="ed flow" d="M150,68 L150,104" marker-end="url(#al)"/>
+              <path class="ed flow" d="M126,120 C96,138 96,60 122,54" marker-end="url(#al)"/>
+              <path class="ed flow" d="M196,52 L226,52" marker-end="url(#al)"/>
+              <rect class="node" x="34" y="40" width="40" height="24" rx="12"/>
+              <text class="nlab" x="54" y="56" text-anchor="middle">START</text>
+              <rect class="node acc" x="104" y="36" width="92" height="32" rx="9"/>
+              <text class="nlab" x="150" y="52" text-anchor="middle">agent</text>
+              <text class="nsub" x="150" y="63" text-anchor="middle">조건 분기 route()</text>
+              <rect class="node" x="112" y="104" width="76" height="32" rx="9"/>
+              <text class="nlab" x="150" y="120" text-anchor="middle">tools</text>
+              <text class="nsub" x="150" y="131" text-anchor="middle">node</text>
+              <rect class="node" x="226" y="40" width="40" height="24" rx="12"/>
+              <text class="nlab" x="246" y="56" text-anchor="middle">END</text>
+              <rect class="statebar" x="30" y="168" width="240" height="30" rx="7"/>
+              <text class="statelab" x="40" y="180">State</text>
+              <text class="capt" x="40" y="192">messages · 채널 + 리듀서로 누적</text>
+              <text class="capt" x="150" y="26" text-anchor="middle">노드·엣지·조건·상태를 개발자가 명시</text>
+            </g>
+          </svg>
+        </div>
+        <ul class="pts">
+          <li><b>개발자가 그래프를 배선한다.</b> 노드(함수)·엣지·조건분기를 명시.</li>
+          <li><b>결정적·명시적 제어</b> — 분기·루프·중단/재개를 정밀하게.</li>
+          <li>공유 <b>State</b>(TypedDict + 리듀서)가 노드 사이를 흐른다.</li>
+          <li>빠른 시작은 프리빌트 <code>create_agent</code>(내부적으로 StateGraph).</li>
+        </ul>
+      </div>
+    </div>
+    <div class="codenote"><b>한 줄 요약</b> — "루프를 모델에 맡길수록" 고수준·단순·비결정적(Strands Agent, OpenAI Agents), "그래프를 손으로 그릴수록" 저수준·명시적·결정적(LangGraph). Strands의 <code>GraphBuilder</code>와 LangGraph의 <code>create_agent</code>가 그 중간에서 서로를 향해 다가옵니다.</div>
+  </section>
+
+  <!-- P2 -->
+  <section class="panel" id="p2">
+    <h2 class="s-title">같은 ReAct 에이전트, 두 가지 코드</h2>
+    <p class="s-sub">계산기 + 날씨 툴을 가진 동일한 에이전트를 각각으로 작성. 줄 수보다 <b>무엇을 개발자가 쓰고 무엇을 프레임워크가 숨기는지</b>를 보세요.</p>
+    <div class="two">
+      <pre class="strands"><span class="h">Strands<small>agentic loop</small></span><code class="blk"><span class="kw">from</span> strands <span class="kw">import</span> Agent, tool
+<span class="kw">from</span> strands_tools <span class="kw">import</span> calculator
+
+<span class="kw">@tool</span>
+<span class="kw">def</span> <span class="fn">weather</span>(city: str) -> str:
+    <span class="st">"도시의 날씨를 반환한다."</span>
+    <span class="kw">return</span> <span class="st">f"{city}: 맑음 22도"</span>
+
+agent = <span class="fn">Agent</span>(tools=[calculator, weather])
+agent(<span class="st">"서울 날씨 알려주고 화씨로 바꿔줘"</span>)
+<span class="cm"># 루프는 모델이 알아서 — 개발자는 툴만 준다</span></code></pre>
+
+      <pre class="lg"><span class="h">LangGraph<small>prebuilt</small></span><code class="blk"><span class="cm"># 빠른 길: 프리빌트 에이전트</span>
+<span class="kw">from</span> langchain.agents <span class="kw">import</span> create_agent
+<span class="cm"># (구) langgraph.prebuilt.create_react_agent — deprecated</span>
+
+agent = <span class="fn">create_agent</span>(
+    model=<span class="st">"anthropic:claude-sonnet-4-..."</span>,
+    tools=[calculator, weather],
+)
+agent.<span class="fn">invoke</span>({<span class="st">"messages"</span>: [
+    {<span class="st">"role"</span>:<span class="st">"user"</span>,<span class="st">"content"</span>:<span class="st">"서울 날씨..."</span>}
+]})
+<span class="cm"># 내부적으로는 StateGraph 한 개</span></code></pre>
+    </div>
+
+    <h3 class="sec">저수준으로 내려가면 — 명시적 그래프</h3>
+    <div class="two">
+      <pre class="strands"><span class="h">Strands<small>GraphBuilder · 결정적 DAG</small></span><code class="blk"><span class="kw">from</span> strands.multiagent <span class="kw">import</span> GraphBuilder
+
+b = <span class="fn">GraphBuilder</span>()
+b.<span class="fn">add_node</span>(researcher, <span class="st">"research"</span>)
+b.<span class="fn">add_node</span>(writer,     <span class="st">"write"</span>)
+b.<span class="fn">add_edge</span>(<span class="st">"research"</span>, <span class="st">"write"</span>)
+graph = b.<span class="fn">build</span>()
+graph(<span class="st">"보고서 써줘"</span>)  <span class="cm"># GraphResult</span></code></pre>
+
+      <pre class="lg"><span class="h">LangGraph<small>StateGraph · 상태+엣지</small></span><code class="blk"><span class="kw">from</span> typing <span class="kw">import</span> Annotated
+<span class="kw">from</span> typing_extensions <span class="kw">import</span> TypedDict
+<span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
+<span class="kw">from</span> langgraph.graph.message <span class="kw">import</span> add_messages
+
+<span class="kw">class</span> <span class="fn">State</span>(TypedDict):
+    messages: Annotated[list, add_messages]  <span class="cm"># 리듀서</span>
+
+g = <span class="fn">StateGraph</span>(State)
+g.<span class="fn">add_node</span>(<span class="st">"agent"</span>, agent_fn)
+g.<span class="fn">add_edge</span>(START, <span class="st">"agent"</span>)
+g.<span class="fn">add_conditional_edges</span>(<span class="st">"agent"</span>, route,
+    {<span class="st">"tools"</span>:<span class="st">"tools"</span>, <span class="st">"end"</span>:END})
+graph = g.<span class="fn">compile</span>(checkpointer=InMemorySaver())</code></pre>
+    </div>
+    <div class="codenote"><b>차이의 본질</b> — Strands는 상태(<code>messages</code>)·루프를 프레임워크가 관리하고 개발자는 툴/노드만 얹습니다. LangGraph는 상태 스키마·리듀서·엣지·조건을 <b>개발자가 1급 시민으로 다룹니다</b> — 그만큼 제어력이 크고, 그만큼 배선이 많습니다.</div>
+  </section>
+
+  <!-- P3 -->
+  <section class="panel" id="p3">
+    <h2 class="s-title">개념 매핑 매트릭스</h2>
+    <p class="s-sub">앞선 자료들에서 다룬 개념이 각 프레임워크에서 무엇으로 불리는지. (가로 스크롤)</p>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr>
+          <th>개념</th><th class="strands">Strands (AWS)</th><th class="lg">LangGraph</th><th>CrewAI</th><th>OpenAI Agents</th><th>Google ADK</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>기본 추상화</td><td><code>Agent</code> 루프 + <code>GraphBuilder</code></td><td><code>StateGraph</code> (노드/엣지/상태)</td><td><code>Agent·Task·Crew</code></td><td><code>Agent</code> + <code>Runner</code></td><td><code>LlmAgent</code> + workflow agents</td></tr>
+          <tr><td>제어 흐름</td><td>모델 주도 루프 / 결정적 DAG</td><td>명시적 그래프 + 조건 엣지</td><td>sequential·hierarchical + Flows</td><td>모델 주도 + handoff</td><td>Sequential·Parallel·Loop</td></tr>
+          <tr><td>상태 관리</td><td><code>messages</code>(Converse) + <code>AgentState</code></td><td>State 스키마 + 리듀서(채널)</td><td>Flow state</td><td><code>Sessions</code></td><td>session state / <code>output_key</code></td></tr>
+          <tr><td>멀티 에이전트</td><td>Graph · Swarm · Agents-as-Tools</td><td>subgraph + supervisor/swarm 라이브러리</td><td>Crew(핵심 개념)</td><td>handoffs</td><td><code>sub_agents</code> + workflow</td></tr>
+          <tr><td>메모리 / 영속화</td><td><code>session_manager</code> + AgentCore Memory</td><td>checkpointer(InMemory/Sqlite/Postgres) + Store</td><td>memory 옵션</td><td>Sessions(SQLite/SQLAlchemy)</td><td>SessionService(InMemory/DB/Vertex)</td></tr>
+          <tr><td>Human-in-loop</td><td><code>interventions</code> / hooks</td><td><code>interrupt()</code> + <code>Command(resume)</code> (강점)</td><td>human input</td><td>guardrails</td><td>제한적</td></tr>
+          <tr><td>관측</td><td>OTel · AgentCore Observability</td><td>LangSmith</td><td>CrewAI AMP</td><td>OpenAI tracing</td><td>Cloud / Vertex</td></tr>
+          <tr><td>배포</td><td>Bedrock AgentCore Runtime</td><td>LangGraph Platform / Server</td><td>CrewAI AMP</td><td>자체 호스팅(라이브러리)</td><td>Vertex Agent Engine · Cloud Run</td></tr>
+          <tr><td>프로바이더</td><td>멀티 (Bedrock 기본)</td><td>멀티 (LangChain 모델)</td><td>멀티 (LiteLLM)</td><td>OpenAI 우선</td><td>Gemini/Vertex 기본</td></tr>
+          <tr><td>성격</td><td>AWS 생태계 통합</td><td>저수준·정밀·벤더중립</td><td>역할 기반·고수준</td><td>얇고 가벼움</td><td>Google 생태계·코드 우선</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="caveat">
+      <h4>⚠️ 검증 시점(2026-07) 주의사항</h4>
+      <ul>
+        <li>LangGraph <b><code>create_react_agent</code>는 deprecated</b> → <code>from langchain.agents import create_agent</code> 권장.</li>
+        <li>LangGraph 체크포인터 정식명은 <b><code>InMemorySaver</code></b> (<code>MemorySaver</code>는 레거시 별칭). 문서는 <code>docs.langchain.com</code>으로 이전됨.</li>
+        <li>Microsoft <b>AutoGen은 유지보수 모드</b> — 신규 개발은 <b>Microsoft Agent Framework</b>(AutoGen+Semantic Kernel 통합). 오픈·자체호스팅 계보는 <b>AG2</b>.</li>
+        <li>Google <b>ADK 2.0은 breaking 릴리스</b>(그래프 Workflow 런타임 추가). 위 클래식 API는 유지되나 튜토리얼이 옛것일 수 있음.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- P4 -->
+  <section class="panel" id="p4">
+    <h2 class="s-title">언제 무엇을 고르나</h2>
+    <p class="s-sub">정답은 없고, 제약(생태계·팀·제어 요구)에 따라 갈립니다.</p>
+    <div class="guide">
+      <div class="gcard g-strands"><div class="nm">Strands <span class="tag">AWS</span></div>
+        <p>이미 <b>AWS/Bedrock</b>에 있고, "툴만 주고 모델에 맡기는" 단순함을 원할 때. 필요하면 Graph/Swarm으로 구조화. 배포·메모리·관측을 <b>AgentCore</b>로 일괄 처리.</p></div>
+      <div class="gcard g-lg"><div class="nm">LangGraph <span class="tag">벤더중립</span></div>
+        <p>제어 흐름을 <b>손으로 정밀하게</b> 그리고 싶을 때 — 복잡한 분기·루프, <b>중단/재개(HITL)</b>, 명시적 상태 관리가 핵심. 러닝커브 대신 최대 제어력.</p></div>
+      <div class="gcard g-crew"><div class="nm">CrewAI <span class="tag">역할기반</span></div>
+        <p><b>역할(role/goal/backstory) 기반 팀 협업</b>을 빠르게 세우고 싶을 때. 높은 추상화 + 이벤트 기반 Flows로 흐름 제어.</p></div>
+      <div class="gcard g-oai"><div class="nm">OpenAI Agents SDK <span class="tag">OpenAI</span></div>
+        <p><b>OpenAI 중심</b>에서 가볍게 — Agents/Handoffs/Guardrails/Sessions 몇 개 프리미티브로 얇은 루프. 최소 추상화 선호 시.</p></div>
+      <div class="gcard g-adk"><div class="nm">Google ADK <span class="tag">Google</span></div>
+        <p><b>Gemini/Vertex 중심</b>에서, LLM 에이전트 위에 <b>결정적 워크플로(Sequential/Parallel/Loop)</b>를 얹고 Vertex로 배포할 때.</p></div>
+      <div class="gcard" style="--acc:var(--line-strong)"><div class="nm">공통 원칙</div>
+        <p>대부분은 <b>단일 에이전트 + 좋은 툴</b>로 충분합니다. 멀티에이전트·복잡한 그래프는 <b>정말 필요할 때</b> 도입하세요 — 제어력은 늘지만 디버깅·비용도 늘어납니다.</p></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="bar"></div>
+    <p><b>큰 그림</b> — 프레임워크는 달라도 안에서 도는 건 같은 <b>agentic loop</b>이고(우리가 본 03번 루프), 여러 개를 엮는 방식(Graph·Swarm·handoff)과 상태·메모리·배포를 각자 다르게 포장할 뿐입니다. Strands를 이해했다면 나머지는 <b>용어 매핑</b> 문제에 가깝습니다.</p>
+  </div>
+</div></div>
+
+<script>
+(function(){
+  document.querySelectorAll(".tab").forEach(tb=>{
+    tb.addEventListener("click",()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected","false"));
+      tb.setAttribute("aria-selected","true");
+      document.querySelectorAll("section.panel").forEach(s=>s.classList.remove("on"));
+      document.getElementById(tb.dataset.t).classList.add("on");
+    });
+  });
+})();
+</script>
