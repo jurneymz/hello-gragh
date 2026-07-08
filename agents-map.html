@@ -1,0 +1,481 @@
+<style>
+  :root{
+    --bg:#eef1f6; --grid:#d6dbe6; --surface:#ffffff; --surface-2:#f6f8fc;
+    --ink:#141a24; --muted:#5a6473; --line:#c9d0dc; --line-strong:#8b95a6;
+    --react:#d97a06; --react-soft:#fbe6c2;
+    --graph:#0c8ea3; --graph-soft:#c7ecf1;
+    --sw:#6d4bd8;    --sw-soft:#e4dcfb;
+    --wf:#2f8a3e;    --wf-soft:#cdeecd;
+    --ac:#2563eb;    --ac-soft:#d6e3ff;
+    --done:#2f9e44;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0c0f16; --grid:#181e2a; --surface:#141a24; --surface-2:#0f141d;
+      --ink:#e7ebf3; --muted:#8c96a8; --line:#293241; --line-strong:#556173;
+      --react:#f5a524; --react-soft:#3a2c12;
+      --graph:#3bd6e6; --graph-soft:#0d2e34;
+      --sw:#a68bff;    --sw-soft:#231a45;
+      --wf:#69db7c;    --wf-soft:#12321a;
+      --ac:#6ea8ff;    --ac-soft:#122447;
+      --done:#51cf66;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#eef1f6;--grid:#d6dbe6;--surface:#ffffff;--surface-2:#f6f8fc;
+    --ink:#141a24;--muted:#5a6473;--line:#c9d0dc;--line-strong:#8b95a6;
+    --react:#d97a06;--react-soft:#fbe6c2;--graph:#0c8ea3;--graph-soft:#c7ecf1;
+    --sw:#6d4bd8;--sw-soft:#e4dcfb;--wf:#2f8a3e;--wf-soft:#cdeecd;--ac:#2563eb;--ac-soft:#d6e3ff;
+    --done:#2f9e44;--shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);
+  }
+  :root[data-theme="dark"]{
+    --bg:#0c0f16;--grid:#181e2a;--surface:#141a24;--surface-2:#0f141d;
+    --ink:#e7ebf3;--muted:#8c96a8;--line:#293241;--line-strong:#556173;
+    --react:#f5a524;--react-soft:#3a2c12;--graph:#3bd6e6;--graph-soft:#0d2e34;
+    --sw:#a68bff;--sw-soft:#231a45;--wf:#69db7c;--wf-soft:#12321a;--ac:#6ea8ff;--ac-soft:#122447;
+    --done:#51cf66;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  .wrap{font-family:var(--sans);color:var(--ink);background:var(--bg);
+    background-image:radial-gradient(var(--grid) 1px,transparent 1px);background-size:22px 22px;
+    min-height:100vh;padding:clamp(20px,4vw,56px)}
+  .page{max-width:1080px;margin:0 auto}
+  header{margin-bottom:26px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--muted);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong)}
+  h1{font-size:clamp(34px,6vw,58px);line-height:1;letter-spacing:-.03em;font-weight:800;margin:14px 0 0;text-wrap:balance}
+  .lede{max-width:62ch;margin:14px 0 0;color:var(--muted);font-size:clamp(15px,2vw,17px);line-height:1.55}
+
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 22px;position:sticky;top:0;z-index:5;
+    padding:10px 0;background:linear-gradient(var(--bg) 70%,transparent)}
+  .tab{font-family:var(--mono);font-size:13px;cursor:pointer;border:1px solid var(--line);
+    background:var(--surface);color:var(--muted);padding:9px 15px;border-radius:10px;box-shadow:var(--shadow);
+    transition:color .15s,border-color .15s;display:flex;align-items:center;gap:8px}
+  .tab .idx{opacity:.5}
+  .tab[aria-selected="true"]{color:var(--ink);border-color:var(--tabc,var(--ink));font-weight:600}
+  .tab[aria-selected="true"] .bar{color:var(--tabc)}
+  .tab:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+  section.panel{display:none}
+  section.panel.on{display:block;animation:fade .3s}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+
+  .s-head{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+  .s-head .txt{flex:1;min-width:240px}
+  .s-tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc)}
+  .s-title{font-size:26px;font-weight:800;letter-spacing:-.01em;margin:4px 0 3px}
+  .s-sub{font-size:14px;color:var(--muted);line-height:1.5;max-width:64ch}
+  button.run{font-family:var(--mono);font-size:13px;cursor:pointer;border:1px solid var(--ink);
+    background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:10px;box-shadow:var(--shadow);font-weight:600;
+    transition:transform .12s;white-space:nowrap}
+  button.run:hover{transform:translateY(-1px)}
+  button.run:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  button.run:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    overflow:hidden;border-top:3px solid var(--acc)}
+  .stage{background:var(--surface-2);padding:10px;display:flex;justify-content:center}
+  svg{width:100%;height:auto;display:block}
+  .cap{font-size:13px;color:var(--muted);line-height:1.5;padding:12px 18px;border-top:1px solid var(--line)}
+  .cap b{color:var(--ink)}
+
+  /* single-diagram layout */
+  .solo{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;align-items:start}
+  @media(max-width:720px){.solo{grid-template-columns:1fr}}
+  .solo svg{max-width:380px;margin:0 auto}
+  .log{margin:0;padding:14px 18px;list-style:none;font-family:var(--mono);font-size:12.5px;line-height:1.5;
+    color:var(--ink);min-height:150px}
+  .log li{opacity:0;transform:translateY(4px);animation:in .3s forwards;display:flex;gap:9px;padding:2px 0}
+  .log li .step{color:var(--muted);flex:none;width:1.4em;text-align:center}
+  .log li.fin{color:var(--done);font-weight:600}
+  @keyframes in{to{opacity:1;transform:none}}
+  .logwrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+  .logwrap h4{margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);padding:12px 18px;border-bottom:1px solid var(--line)}
+
+  /* 4-up grid for multi-agent */
+  .quad{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:640px){.quad{grid-template-columns:1fr}}
+  .mini-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:14px 16px 8px}
+  .mini-head .n{font-size:17px;font-weight:800}
+  .mini-head .chip{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--acc);
+    border:1px solid var(--acc);border-radius:20px;padding:2px 8px;white-space:nowrap}
+  .minilog{margin:0;padding:8px 16px 14px;list-style:none;font-family:var(--mono);font-size:11px;line-height:1.5;
+    color:var(--muted);min-height:66px;border-top:1px solid var(--line)}
+  .minilog li{opacity:0;animation:in .3s forwards;display:flex;gap:7px}
+  .minilog li .step{color:var(--acc)}
+  .minilog li.fin{color:var(--done);font-weight:600}
+
+  /* node/edge */
+  .node rect{fill:var(--surface);stroke:var(--line-strong);stroke-width:1.5;transition:fill .2s,stroke .2s}
+  .node .lab{fill:var(--ink);font-family:var(--sans);font-weight:700;font-size:13px}
+  .node .sub{fill:var(--muted);font-family:var(--mono);font-size:8.5px;letter-spacing:.05em;text-transform:uppercase}
+  .node.active rect{fill:var(--acc-soft);stroke:var(--acc);stroke-width:2.5}
+  .node.done rect{stroke:var(--done)}
+  .node.persist rect{stroke-dasharray:2 2.6}
+  .mini .lab{font-size:10.5px} .mini .sub{font-size:7px}
+  .edge{stroke:var(--line-strong);stroke-width:1.6;fill:none;opacity:.6;transition:opacity .2s,stroke .2s}
+  .edge.lit{stroke:var(--acc);opacity:1;stroke-width:2.2}
+  .edge.loop{stroke-dasharray:5 4}
+  .edge.dim{opacity:.22;stroke-dasharray:3 4;stroke-width:1.2}
+  .pulse{fill:var(--acc)}
+  .edge-lab{fill:var(--muted);font-family:var(--mono);font-size:8.5px;letter-spacing:.04em}
+
+  .foot{margin-top:34px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);display:flex;gap:16px;align-items:flex-start}
+  .foot .bar{width:3px;align-self:stretch;background:linear-gradient(var(--react),var(--sw),var(--graph));border-radius:3px;flex:none}
+  .foot p{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
+  .foot b{color:var(--ink)}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
+</style>
+
+<div class="wrap"><div class="page">
+  <header>
+    <div class="eyebrow"><span>Strands Agents</span><span class="dot"></span><span>Bedrock AgentCore</span><span class="dot"></span><span>에이전트 지식 맵</span></div>
+    <h1>에이전트, 이렇게 굴러갑니다</h1>
+    <p class="lede">단일 에이전트(ReAct)를 넘어, 여러 에이전트를 엮는 방법·런타임의 구성요소·루프 내부·기억까지. 탭을 눌러 각 개념을 실행해 보세요.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-t="p1" aria-selected="true"><span class="idx">01</span> 멀티 에이전트 4패턴</button>
+    <button class="tab" role="tab" data-t="p2" aria-selected="false"><span class="idx">02</span> AgentCore 빌딩블록</button>
+    <button class="tab" role="tab" data-t="p3" aria-selected="false"><span class="idx">03</span> Agent Loop 내부</button>
+    <button class="tab" role="tab" data-t="p4" aria-selected="false"><span class="idx">04</span> Memory 동작</button>
+  </div>
+
+  <!-- P1 -->
+  <section class="panel on" id="p1">
+    <div class="s-head">
+      <div class="txt">
+        <div class="s-tag" style="--acc:var(--graph)">strands.multiagent · 4 patterns</div>
+        <div class="s-title">여러 에이전트를 엮는 4가지 방법</div>
+        <div class="s-sub">Strands가 다중 에이전트를 구성하는 기본기. 넷을 동시에 돌려 <b>흐름의 성격</b>을 비교하세요 — 고정 vs 자율, 순차 vs 허브.</div>
+      </div>
+      <button class="run" data-run="p1">▶ 넷 동시 실행</button>
+    </div>
+    <div class="quad">
+      <div class="card" style="--acc:var(--graph)">
+        <div class="mini-head"><span class="n">Graph</span><span class="chip">고정 DAG · 결정적</span></div>
+        <div class="stage"><svg id="d-graph" viewBox="0 0 260 182" class="mini"></svg></div>
+        <ul class="minilog" id="l-graph"></ul>
+      </div>
+      <div class="card" style="--acc:var(--sw)">
+        <div class="mini-head"><span class="n">Swarm</span><span class="chip">자율 핸드오프</span></div>
+        <div class="stage"><svg id="d-swarm" viewBox="0 0 260 182" class="mini"></svg></div>
+        <ul class="minilog" id="l-swarm"></ul>
+      </div>
+      <div class="card" style="--acc:var(--wf)">
+        <div class="mini-head"><span class="n">Workflow</span><span class="chip">순차 파이프라인</span></div>
+        <div class="stage"><svg id="d-wf" viewBox="0 0 260 182" class="mini"></svg></div>
+        <ul class="minilog" id="l-wf"></ul>
+      </div>
+      <div class="card" style="--acc:var(--react)">
+        <div class="mini-head"><span class="n">Agents-as-Tools</span><span class="chip">허브-스포크</span></div>
+        <div class="stage"><svg id="d-tool" viewBox="0 0 260 182" class="mini"></svg></div>
+        <ul class="minilog" id="l-tool"></ul>
+      </div>
+    </div>
+    <p class="cap" style="border:1px solid var(--line);border-radius:14px;margin-top:16px;background:var(--surface)">
+      <b>고르는 기준</b> — 순서·검증이 중요하면 <b>Graph/Workflow</b>, 다음에 누가 일할지 모델이 판단하게 하려면 <b>Swarm</b>, 전문 에이전트를 기능처럼 불러 쓰려면 <b>Agents-as-Tools</b>.
+    </p>
+  </section>
+
+  <!-- P2 -->
+  <section class="panel" id="p2">
+    <div class="s-head">
+      <div class="txt">
+        <div class="s-tag" style="--acc:var(--ac)">bedrock-agentcore · building blocks</div>
+        <div class="s-title">AgentCore 빌딩블록 맵</div>
+        <div class="s-sub">요청 하나가 들어왔을 때 Identity·Runtime·Memory·Gateway·Observability가 <b>어떻게 맞물리는지</b> 경로를 따라가 봅니다.</div>
+      </div>
+      <button class="run" data-run="p2">▶ 요청 추적</button>
+    </div>
+    <div class="card" style="--acc:var(--ac)">
+      <div class="solo" style="padding:6px">
+        <div class="stage" style="background:none"><svg id="d-ac" viewBox="0 0 360 320"></svg></div>
+        <div class="logwrap" style="box-shadow:none;border:none"><h4>요청 경로</h4><ul class="log" id="l-ac"></ul></div>
+      </div>
+      <p class="cap"><b>핵심</b> — 이 블록들은 조합형입니다. 다 쓸 필요 없이, 필요한 것만(예: Runtime + Memory) 골라 붙입니다. 에이전트 코드는 그대로 두고 <b>인프라 걱정을 런타임에 위임</b>하는 게 목적.</p>
+    </div>
+  </section>
+
+  <!-- P3 -->
+  <section class="panel" id="p3">
+    <div class="s-head">
+      <div class="txt">
+        <div class="s-tag" style="--acc:var(--react)">agentic event loop</div>
+        <div class="s-title">Agent Loop 내부 한 사이클</div>
+        <div class="s-sub">ReAct의 속을 확대한 그림. 모델이 <code>tool_use</code>를 내면 툴을 실행해 <code>tool_result</code>를 <b>messages에 되먹임</b>하고, 더 부를 툴이 없을 때 최종 텍스트를 냅니다.</div>
+      </div>
+      <button class="run" data-run="p3">▶ 루프 실행</button>
+    </div>
+    <div class="card" style="--acc:var(--react)">
+      <div class="solo" style="padding:6px">
+        <div class="stage" style="background:none"><svg id="d-loop" viewBox="0 0 320 330"></svg></div>
+        <div class="logwrap" style="box-shadow:none;border:none"><h4>event loop</h4><ul class="log" id="l-loop"></ul></div>
+      </div>
+      <p class="cap"><b>핵심</b> — 반복을 멈추는 건 코드가 아니라 <b>모델의 판단</b>입니다. tool_use 블록이 더 안 나오면 그 자체가 종료 신호.</p>
+    </div>
+  </section>
+
+  <!-- P4 -->
+  <section class="panel" id="p4">
+    <div class="s-head">
+      <div class="txt">
+        <div class="s-tag" style="--acc:var(--graph)">short-term vs long-term memory</div>
+        <div class="s-title">Memory 동작</div>
+        <div class="s-sub">한 대화 안의 <b>단기 기억</b>(context window, 휘발)과, 세션이 바뀌어도 남는 <b>장기 기억</b>(AgentCore Memory). 이벤트를 저장하고 전략으로 요약해 다음에 되불러옵니다.</div>
+      </div>
+      <button class="run" data-run="p4">▶ 기억 흐름</button>
+    </div>
+    <div class="card" style="--acc:var(--graph)">
+      <div class="solo" style="padding:6px">
+        <div class="stage" style="background:none"><svg id="d-mem" viewBox="0 0 360 300"></svg></div>
+        <div class="logwrap" style="box-shadow:none;border:none"><h4>저장 → 요약 → 검색</h4><ul class="log" id="l-mem"></ul></div>
+      </div>
+      <p class="cap"><b>핵심</b> — 단기 기억은 창을 넘으면 사라집니다(점선 블록). 오래 기억해야 할 사실·선호는 <b>장기 저장소</b>에 이벤트로 남기고, 다음 세션에서 관련된 것만 검색해 주입.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="bar"></div>
+    <p><b>하나로 꿰면</b> — 단일 에이전트는 <b>루프(03)</b>로 돌고, 여러 개를 엮을 땐 <b>4패턴(01)</b> 중 하나를 고릅니다. 기억은 <b>Memory(04)</b>가, 실행·인증·툴연결·관측은 <b>AgentCore(02)</b>가 맡습니다. 앞서 만든 <b>ReAct vs Graph</b>는 이 지도의 01번 첫 갈림길이었어요.</p>
+  </div>
+</div></div>
+
+<script>
+(function(){
+  const NS="http://www.w3.org/2000/svg";
+  const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+  function clip(cx,cy,hw,hh,tx,ty){
+    let dx=tx-cx,dy=ty-cy; if(!dx&&!dy)return[cx,cy];
+    const t=Math.min(dx?hw/Math.abs(dx):1e9, dy?hh/Math.abs(dy):1e9);
+    return[cx+dx*t,cy+dy*t];
+  }
+
+  class Diagram{
+    constructor(svgId,logId,cfg){
+      this.svg=document.getElementById(svgId); this.logId=logId;
+      this.cfg=cfg; this.hh=cfg.hh||22; this.tokens=[]; this.raf=[];
+      this.build();
+    }
+    build(){
+      const svg=this.svg,cfg=this.cfg; svg.innerHTML="";
+      const strong=getComputedStyle(svg).getPropertyValue("--line-strong").trim()||"#888";
+      const defs=document.createElementNS(NS,"defs");
+      const mk=(id,c)=>{const m=document.createElementNS(NS,"marker");
+        m.id=id;m.setAttribute("markerWidth","8");m.setAttribute("markerHeight","8");
+        m.setAttribute("refX","6");m.setAttribute("refY","3");m.setAttribute("orient","auto");
+        const p=document.createElementNS(NS,"path");p.setAttribute("d","M0,0 L6,3 L0,6 Z");p.setAttribute("fill",c);
+        m.appendChild(p);return m;};
+      defs.appendChild(mk("a-"+cfg.tag,strong));
+      defs.appendChild(mk("al-"+cfg.tag,getComputedStyle(svg).getPropertyValue("--acc").trim()||"#000"));
+      svg.appendChild(defs);
+      this.edgeEls={};
+      cfg.edges.forEach(e=>{
+        const A=cfg.nodes[e.a],B=cfg.nodes[e.b];
+        const s=clip(A.x,A.y,A.hw||cfg.hw,this.hh,B.x,B.y);
+        const t=clip(B.x,B.y,B.hw||cfg.hw,this.hh,A.x,A.y);
+        const p=document.createElementNS(NS,"path");
+        p.setAttribute("d",`M${s[0]},${s[1]} L${t[0]},${t[1]}`);
+        p.setAttribute("class","edge"+(e.cls?" "+e.cls:"")+(e.faint?" dim":""));
+        if(!e.faint)p.setAttribute("marker-end","url(#a-"+cfg.tag+")");
+        svg.appendChild(p); this.edgeEls[e.id]=p;
+        if(e.lab){const mx=(s[0]+t[0])/2,my=(s[1]+t[1])/2;
+          const tx=document.createElementNS(NS,"text");
+          tx.setAttribute("x",mx+5);tx.setAttribute("y",my-3);tx.setAttribute("class","edge-lab");
+          tx.textContent=e.lab;svg.appendChild(tx);}
+      });
+      this.nodeEls={};
+      Object.entries(cfg.nodes).forEach(([id,n])=>{
+        const hw=n.hw||cfg.hw;
+        const g=document.createElementNS(NS,"g");g.setAttribute("class","node"+(n.cls?" "+n.cls:""));
+        const r=document.createElementNS(NS,"rect");
+        r.setAttribute("x",n.x-hw);r.setAttribute("y",n.y-this.hh);
+        r.setAttribute("width",hw*2);r.setAttribute("height",this.hh*2);r.setAttribute("rx","9");
+        g.appendChild(r);
+        const l=document.createElementNS(NS,"text");
+        l.setAttribute("x",n.x);l.setAttribute("y",n.sub?n.y-1:n.y+4);l.setAttribute("text-anchor","middle");
+        l.setAttribute("class","lab");l.textContent=n.lab;g.appendChild(l);
+        if(n.sub){const s=document.createElementNS(NS,"text");
+          s.setAttribute("x",n.x);s.setAttribute("y",n.y+12);s.setAttribute("text-anchor","middle");
+          s.setAttribute("class","sub");s.textContent=n.sub;g.appendChild(s);}
+        svg.appendChild(g); this.nodeEls[id]=g;
+      });
+    }
+    reset(){
+      this.raf.forEach(id=>cancelAnimationFrame(id));this.raf=[];
+      this.tokens.forEach(t=>t.remove());this.tokens=[];
+      Object.values(this.nodeEls).forEach(n=>n.classList.remove("active","done"));
+      Object.values(this.edgeEls).forEach(e=>{e.classList.remove("lit");
+        if(e.getAttribute("marker-end"))e.setAttribute("marker-end","url(#a-"+this.cfg.tag+")");});
+      const ul=document.getElementById(this.logId); if(ul)ul.innerHTML="";
+    }
+    lit(id,on){const e=this.edgeEls[id];if(!e)return;e.classList.toggle("lit",on);
+      if(e.getAttribute("marker-end"))e.setAttribute("marker-end",on?"url(#al-"+this.cfg.tag+")":"url(#a-"+this.cfg.tag+")");}
+    log(o){if(!o)return;const ul=document.getElementById(this.logId);if(!ul)return;
+      const li=document.createElement("li");if(o.fin)li.className="fin";
+      li.innerHTML=`<span class="step">${o.s||"·"}</span><span>${o.t}</span>`;ul.appendChild(li);}
+    pulse(id,dur){return new Promise(res=>{
+      const path=this.edgeEls[id];if(!path){res();return;}this.lit(id,true);
+      if(reduce){setTimeout(res,110);return;}
+      const len=path.getTotalLength();
+      const c=document.createElementNS(NS,"circle");c.setAttribute("r","4.3");c.setAttribute("class","pulse");
+      this.svg.appendChild(c);this.tokens.push(c);
+      const t0=performance.now();
+      const step=now=>{let k=Math.min(1,(now-t0)/dur);const p=path.getPointAtLength(len*k);
+        c.setAttribute("cx",p.x);c.setAttribute("cy",p.y);
+        if(k<1)this.raf.push(requestAnimationFrame(step));
+        else{c.remove();this.tokens=this.tokens.filter(x=>x!==c);res();}};
+      this.raf.push(requestAnimationFrame(step));
+    });}
+    async run(){
+      this.reset(); const D=reduce?0:620;
+      for(const ph of this.cfg.phases){
+        this.log(ph.log);
+        (ph.deact||[]).forEach(n=>{const g=this.nodeEls[n];if(g){g.classList.remove("active");g.classList.add("done");}});
+        if(ph.p&&ph.p.length){
+          await Promise.all(ph.p.map(id=>this.pulse(id,D)));
+          ph.p.forEach(id=>this.lit(id,false));
+        }
+        (ph.act||[]).forEach(n=>{const g=this.nodeEls[n];if(g)g.classList.add("active");});
+        (ph.fin||[]).forEach(n=>{const g=this.nodeEls[n];if(g)g.classList.add("done");});
+        await new Promise(r=>setTimeout(r,ph.pause!=null?ph.pause:(reduce?40:150)));
+      }
+    }
+  }
+
+  // ---------- configs ----------
+  const C={};
+
+  C.graph={tag:"gr",hw:48,hh:17,
+    nodes:{router:{x:130,y:28,lab:"Router",sub:"진입"},b:{x:62,y:92,lab:"Agent B",sub:"작업"},
+      c:{x:198,y:92,lab:"Agent C",sub:"작업"},merge:{x:130,y:156,lab:"Merge",sub:"병합"}},
+    edges:[{id:"r-b",a:"router",b:"b"},{id:"r-c",a:"router",b:"c"},{id:"b-m",a:"b",b:"merge"},{id:"c-m",a:"c",b:"merge"}],
+    phases:[{act:["router"],log:{s:"▶",t:"진입"}},
+      {p:["r-b","r-c"],deact:["router"],act:["b","c"],log:{s:"⑂",t:"병렬 분기"}},
+      {p:["b-m","c-m"],deact:["b","c"],act:["merge"],log:{s:"⑃",t:"결정적 병합"}},
+      {deact:["merge"],log:{s:"✓",t:"항상 같은 경로",fin:true}}]};
+
+  C.swarm={tag:"sw",hw:46,hh:17,
+    nodes:{a:{x:130,y:26,lab:"Agent A"},b:{x:206,y:91,lab:"Agent B"},c:{x:130,y:156,lab:"Agent C"},d:{x:54,y:91,lab:"Agent D"}},
+    edges:[{id:"f1",a:"a",b:"b",faint:1},{id:"f2",a:"b",b:"c",faint:1},{id:"f3",a:"a",b:"d",faint:1},
+      {id:"a-c",a:"a",b:"c"},{id:"c-d",a:"c",b:"d"},{id:"d-b",a:"d",b:"b"}],
+    phases:[{act:["a"],log:{s:"▶",t:"시작: A"}},
+      {p:["a-c"],deact:["a"],act:["c"],log:{s:"⇄",t:"자율 핸드오프 → C"}},
+      {p:["c-d"],deact:["c"],act:["d"],log:{s:"⇄",t:"→ D (모델이 결정)"}},
+      {p:["d-b"],deact:["d"],act:["b"],log:{s:"✓",t:"경로 매번 달라짐",fin:true}}]};
+
+  C.wf={tag:"wf",hw:60,hh:15,
+    nodes:{t1:{x:130,y:26,lab:"Task 1"},t2:{x:130,y:70,lab:"Task 2"},t3:{x:130,y:114,lab:"Task 3"},t4:{x:130,y:158,lab:"Task 4"}},
+    edges:[{id:"12",a:"t1",b:"t2"},{id:"23",a:"t2",b:"t3"},{id:"34",a:"t3",b:"t4"}],
+    phases:[{act:["t1"],log:{s:"1",t:"Task 1"}},
+      {p:["12"],deact:["t1"],act:["t2"],log:{s:"2",t:"→ Task 2"}},
+      {p:["23"],deact:["t2"],act:["t3"],log:{s:"3",t:"→ Task 3"}},
+      {p:["34"],deact:["t3"],act:["t4"],log:{s:"✓",t:"순차 완료",fin:true}}]};
+
+  C.tool={tag:"tl",hw:42,hh:16,
+    nodes:{orch:{x:122,y:92,lab:"Orchestr.",sub:"허브",hw:52},s1:{x:56,y:30,lab:"Sub A"},s2:{x:208,y:44,lab:"Sub B"},s3:{x:196,y:154,lab:"Sub C"}},
+    edges:[{id:"o1",a:"orch",b:"s1"},{id:"o2",a:"orch",b:"s2"},{id:"o3",a:"orch",b:"s3"}],
+    phases:[{act:["orch"],log:{s:"▶",t:"오케스트레이터 판단"}},
+      {p:["o1"],act:["s1"],log:{s:"→",t:"Sub A 호출 (tool처럼)"}},
+      {p:["o2"],act:["s2"],log:{s:"→",t:"Sub B 호출"}},
+      {p:["o3"],act:["s3"],log:{s:"→",t:"Sub C 호출"}},
+      {deact:["orch","s1","s2","s3"],log:{s:"✓",t:"결과 종합 → 응답",fin:true}}]};
+
+  C.ac={tag:"ac",hw:44,hh:21,
+    nodes:{req:{x:46,y:46,lab:"요청",sub:"invoke",hw:38},
+      id:{x:46,y:150,lab:"Identity",sub:"인증·인가"},
+      rt:{x:188,y:150,lab:"Runtime",sub:"에이전트 실행",hw:60},
+      mem:{x:188,y:44,lab:"Memory",sub:"단기·장기"},
+      gw:{x:314,y:96,lab:"Gateway",sub:"MCP·툴",hw:42},
+      tools:{x:314,y:186,lab:"외부 API",sub:"tools",hw:42},
+      obs:{x:188,y:260,lab:"Observability",sub:"추적·로그",hw:62}},
+    edges:[{id:"req-id",a:"req",b:"id"},{id:"id-rt",a:"id",b:"rt"},{id:"rt-mem",a:"rt",b:"mem"},
+      {id:"rt-gw",a:"rt",b:"gw"},{id:"gw-t",a:"gw",b:"tools"},{id:"rt-obs",a:"rt",b:"obs"}],
+    phases:[{act:["req"],log:{s:"▶",t:"요청 도착 (invoke)"}},
+      {p:["req-id"],deact:["req"],act:["id"],log:{s:"1",t:"Identity: 인증·인가"}},
+      {p:["id-rt"],deact:["id"],act:["rt"],log:{s:"2",t:"Runtime: 에이전트 시작"}},
+      {p:["rt-mem"],act:["mem"],log:{s:"3",t:"Memory: 이전 맥락 로드"}},
+      {p:["rt-gw"],act:["gw"],log:{s:"4",t:"Gateway: 툴 연결"}},
+      {p:["gw-t"],act:["tools"],log:{s:"5",t:"외부 API 호출"}},
+      {p:["rt-obs"],act:["obs"],log:{s:"6",t:"Observability: 전 과정 기록"}},
+      {deact:["rt","mem","gw","tools","obs"],log:{s:"✓",t:"응답 반환",fin:true}}]};
+
+  C.loop={tag:"lp",hw:56,hh:22,
+    nodes:{input:{x:92,y:48,lab:"메시지",sub:"user"},model:{x:92,y:142,lab:"Model",sub:"추론"},
+      tool:{x:232,y:106,lab:"Tool",sub:"실행"},result:{x:232,y:214,lab:"tool_result",sub:"관찰",hw:52},
+      output:{x:92,y:278,lab:"최종 text",sub:"assistant"}},
+    edges:[{id:"in-m",a:"input",b:"model"},{id:"m-t",a:"model",b:"tool",lab:"tool_use"},
+      {id:"t-r",a:"tool",b:"result"},{id:"r-m",a:"result",b:"model",cls:"loop",lab:"되먹임"},
+      {id:"m-o",a:"model",b:"output",lab:"완료"}],
+    phases:[{act:["input"],log:{s:"▶",t:"user 메시지 입력"}},
+      {p:["in-m"],deact:["input"],act:["model"],log:{s:"·",t:"모델 추론 시작"}},
+      {p:["m-t"],deact:["model"],act:["tool"],log:{s:"1",t:"iter 1: tool_use 블록 생성"}},
+      {p:["t-r"],deact:["tool"],act:["result"],log:{s:"·",t:"툴 실행 → tool_result"}},
+      {p:["r-m"],deact:["result"],act:["model"],log:{s:"↩",t:"messages에 추가 → 재추론"}},
+      {p:["m-t"],deact:["model"],act:["tool"],log:{s:"2",t:"iter 2: 또 tool_use"}},
+      {p:["t-r"],deact:["tool"],act:["result"],log:{s:"·",t:"tool_result 반환"}},
+      {p:["r-m"],deact:["result"],act:["model"],log:{s:"↩",t:"재추론 (충분?)"}},
+      {p:["m-o"],deact:["model"],act:["output"],fin:["output"],log:{s:"✓",t:"tool_use 없음 → 최종 text",fin:true}}]};
+
+  C.mem={tag:"mm",hw:52,hh:21,
+    nodes:{turn:{x:88,y:44,lab:"대화 턴",sub:"user"},
+      st:{x:88,y:140,lab:"Short-term",sub:"context window"},
+      lt:{x:262,y:96,lab:"Long-term",sub:"AgentCore Memory",hw:62,cls:"persist"},
+      strat:{x:262,y:196,lab:"Strategies",sub:"요약·사실·선호",hw:56,cls:"persist"},
+      next:{x:88,y:250,lab:"다음 세션",sub:"retrieve"}},
+    edges:[{id:"t-st",a:"turn",b:"st"},{id:"st-lt",a:"st",b:"lt",lab:"이벤트 저장"},
+      {id:"lt-str",a:"lt",b:"strat"},{id:"str-n",a:"strat",b:"next",lab:"검색·주입"}],
+    phases:[{act:["turn"],log:{s:"▶",t:"사용자 발화 (턴)"}},
+      {p:["t-st"],deact:["turn"],act:["st"],log:{s:"1",t:"단기: context window에 누적"}},
+      {p:["st-lt"],act:["lt"],log:{s:"2",t:"이벤트를 장기 저장소에 기록"}},
+      {p:["lt-str"],act:["strat"],log:{s:"3",t:"전략: 요약·사실·선호 추출"}},
+      {p:["str-n"],deact:["st"],act:["next"],fin:["next"],log:{s:"4",t:"다음 세션에서 관련 기억만 검색"}},
+      {log:{s:"✓",t:"세션이 바뀌어도 장기기억 유지",fin:true}}]};
+
+  // ---------- instantiate ----------
+  let diags={};
+  function boot(){
+    diags={
+      p1:[new Diagram("d-graph","l-graph",C.graph),new Diagram("d-swarm","l-swarm",C.swarm),
+          new Diagram("d-wf","l-wf",C.wf),new Diagram("d-tool","l-tool",C.tool)],
+      p2:[new Diagram("d-ac","l-ac",C.ac)],
+      p3:[new Diagram("d-loop","l-loop",C.loop)],
+      p4:[new Diagram("d-mem","l-mem",C.mem)],
+    };
+  }
+  boot();
+
+  // tabs
+  const tabc={p1:"var(--graph)",p2:"var(--ac)",p3:"var(--react)",p4:"var(--graph)"};
+  document.querySelectorAll(".tab").forEach(tb=>{
+    tb.style.setProperty("--tabc",tabc[tb.dataset.t]);
+    tb.addEventListener("click",()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected","false"));
+      tb.setAttribute("aria-selected","true");
+      document.querySelectorAll("section.panel").forEach(s=>s.classList.remove("on"));
+      document.getElementById(tb.dataset.t).classList.add("on");
+    });
+  });
+
+  // run buttons
+  const busy={};
+  document.querySelectorAll("button.run").forEach(btn=>{
+    btn.addEventListener("click",async()=>{
+      const key=btn.dataset.run; if(busy[key])return; busy[key]=true; btn.disabled=true;
+      await Promise.all(diags[key].map(d=>d.run()));
+      busy[key]=false; btn.disabled=false;
+    });
+  });
+
+  new MutationObserver(()=>{Object.values(diags).flat().forEach(d=>d.build());})
+    .observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();
+</script>
