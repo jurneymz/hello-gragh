@@ -1,0 +1,480 @@
+<style>
+  :root{
+    --bg:#eef1f6; --grid:#d6dbe6; --surface:#ffffff; --surface-2:#f6f8fc;
+    --ink:#141a24; --muted:#5a6473; --line:#c9d0dc; --line-strong:#8b95a6;
+    --react:#d97a06; --react-soft:#fbe6c2; --react-line:#e8930f;
+    --graph:#0c8ea3; --graph-soft:#c7ecf1; --graph-line:#11a7bf;
+    --done:#2f9e44;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#0c0f16; --grid:#181e2a; --surface:#141a24; --surface-2:#0f141d;
+      --ink:#e7ebf3; --muted:#8c96a8; --line:#293241; --line-strong:#556173;
+      --react:#f5a524; --react-soft:#3a2c12; --react-line:#f5a524;
+      --graph:#3bd6e6; --graph-soft:#0d2e34; --graph-line:#3bd6e6;
+      --done:#51cf66;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#eef1f6; --grid:#d6dbe6; --surface:#ffffff; --surface-2:#f6f8fc;
+    --ink:#141a24; --muted:#5a6473; --line:#c9d0dc; --line-strong:#8b95a6;
+    --react:#d97a06; --react-soft:#fbe6c2; --react-line:#e8930f;
+    --graph:#0c8ea3; --graph-soft:#c7ecf1; --graph-line:#11a7bf; --done:#2f9e44;
+    --shadow:0 1px 2px rgba(20,26,36,.06),0 8px 30px rgba(20,26,36,.08);
+  }
+  :root[data-theme="dark"]{
+    --bg:#0c0f16; --grid:#181e2a; --surface:#141a24; --surface-2:#0f141d;
+    --ink:#e7ebf3; --muted:#8c96a8; --line:#293241; --line-strong:#556173;
+    --react:#f5a524; --react-soft:#3a2c12; --react-line:#f5a524;
+    --graph:#3bd6e6; --graph-soft:#0d2e34; --graph-line:#3bd6e6; --done:#51cf66;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 40px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box}
+  .wrap{
+    font-family:var(--sans); color:var(--ink); background:var(--bg);
+    background-image:radial-gradient(var(--grid) 1px,transparent 1px);
+    background-size:22px 22px;
+    min-height:100vh; padding:clamp(20px,4vw,56px);
+  }
+  .page{max-width:1080px;margin:0 auto}
+
+  header{margin-bottom:34px}
+  .eyebrow{
+    font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--muted); display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong)}
+  h1{
+    font-size:clamp(38px,7vw,68px); line-height:.98; letter-spacing:-.03em; font-weight:800;
+    margin:14px 0 0; text-wrap:balance;
+  }
+  h1 .r{color:var(--react)} h1 .g{color:var(--graph)} h1 .vs{color:var(--muted);font-weight:400}
+  .lede{
+    max-width:60ch; margin:16px 0 0; color:var(--muted); font-size:clamp(15px,2vw,18px); line-height:1.55;
+  }
+
+  .controls{
+    display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:26px 0 22px;
+  }
+  button{
+    font-family:var(--mono); font-size:13px; letter-spacing:.02em; cursor:pointer;
+    border:1px solid var(--line); background:var(--surface); color:var(--ink);
+    padding:11px 18px; border-radius:10px; box-shadow:var(--shadow); transition:transform .12s,border-color .12s;
+  }
+  button:hover{transform:translateY(-1px)}
+  button:focus-visible{outline:2px solid var(--graph);outline-offset:2px}
+  button.primary{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+  button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .hint{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:auto}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media(max-width:760px){.grid2{grid-template-columns:1fr}}
+
+  .panel{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column;
+    border-top:3px solid var(--accent);
+  }
+  .panel.react{--accent:var(--react);--accent-soft:var(--react-soft);--accent-line:var(--react-line)}
+  .panel.graph{--accent:var(--graph);--accent-soft:var(--graph-soft);--accent-line:var(--graph-line)}
+
+  .p-head{padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+  .p-tag{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  .p-title{font-size:22px;font-weight:800;letter-spacing:-.01em;margin:5px 0 2px}
+  .p-sub{font-size:13px;color:var(--muted);line-height:1.45}
+
+  .stage{padding:8px 10px 4px;display:flex;justify-content:center;background:var(--surface-2)}
+  svg{width:100%;height:auto;display:block;max-width:340px}
+
+  .node rect{fill:var(--surface);stroke:var(--line-strong);stroke-width:1.5;transition:fill .2s,stroke .2s}
+  .node .lab{fill:var(--ink);font-family:var(--sans);font-weight:700;font-size:14px}
+  .node .sub{fill:var(--muted);font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase}
+  .node.active rect{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.5}
+  .node.done rect{stroke:var(--done)}
+  .edge{stroke:var(--line-strong);stroke-width:1.6;fill:none;opacity:.65;transition:opacity .2s,stroke .2s}
+  .edge.lit{stroke:var(--accent);opacity:1;stroke-width:2.2}
+  .edge.loop{stroke-dasharray:5 4}
+  .pulse{fill:var(--accent)}
+  .edge-lab{fill:var(--muted);font-family:var(--mono);font-size:8.5px;letter-spacing:.05em}
+
+  .meter{
+    display:flex;gap:16px;padding:10px 20px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:12px;color:var(--muted);
+  }
+  .meter b{color:var(--accent);font-size:15px}
+  .meter .m{display:flex;flex-direction:column;gap:1px}
+
+  .log{
+    margin:0;padding:12px 20px 18px;list-style:none;font-family:var(--mono);font-size:12px;
+    line-height:1.5;color:var(--ink);min-height:132px;border-top:1px solid var(--line);
+  }
+  .log li{opacity:0;transform:translateY(4px);animation:in .3s forwards;display:flex;gap:8px}
+  .log li .step{color:var(--muted)}
+  .log li.fin{color:var(--done);font-weight:600}
+  @keyframes in{to{opacity:1;transform:none}}
+
+  .cmp{margin-top:36px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .cmp h2{font-size:15px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;margin:0;padding:16px 20px;border-bottom:1px solid var(--line);color:var(--muted)}
+  .tbl-scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+  th,td{text-align:left;padding:13px 20px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+  th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  thead th:nth-child(2){color:var(--react)} thead th:nth-child(3){color:var(--graph)}
+  td:first-child{font-weight:600;color:var(--muted);white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  code{font-family:var(--mono);font-size:.86em;background:var(--surface-2);padding:1px 5px;border-radius:5px;border:1px solid var(--line)}
+
+  .code2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+  @media(max-width:760px){.code2{grid-template-columns:1fr}}
+  pre{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.6;border-top:3px solid var(--accent)}
+  pre.react{--accent:var(--react)} pre.graph{--accent:var(--graph)}
+  pre .h{display:block;padding:12px 18px;border-bottom:1px solid var(--line);color:var(--accent);font-weight:600;letter-spacing:.02em}
+  pre code.blk{display:block;padding:16px 18px;background:none;border:none;border-radius:0;white-space:pre}
+  .kw{color:var(--graph)} .st{color:var(--done)} .cm{color:var(--muted)} .fn{color:var(--react)}
+
+  .foot{margin-top:32px;padding:20px 22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:16px;align-items:flex-start}
+  .foot .bar{width:3px;align-self:stretch;background:linear-gradient(var(--react),var(--graph));border-radius:3px;flex:none}
+  .foot p{margin:0;font-size:14px;line-height:1.55;color:var(--muted)}
+  .foot b{color:var(--ink)}
+  @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
+</style>
+
+<div class="wrap">
+<div class="page">
+
+  <header>
+    <div class="eyebrow"><span>Strands Agents</span><span class="dot"></span><span>Bedrock AgentCore</span><span class="dot"></span><span>실행 모델 비교</span></div>
+    <h1><span class="r">ReAct</span> <span class="vs">vs</span> <span class="g">Graph</span></h1>
+    <p class="lede">같은 작업을 줬을 때, 에이전트가 <b>스스로 판단하며 루프를 도는가(ReAct)</b>, 아니면 <b>개발자가 그린 고정된 그래프를 따라가는가(Graph)</b>. 아래에서 실행해 흐름을 직접 비교하세요.</p>
+  </header>
+
+  <div class="controls">
+    <button class="primary" id="run">▶ 동시 실행</button>
+    <button id="reset">↺ 초기화</button>
+    <span class="hint">tip — 여러 번 실행: ReAct는 매번 반복 수가 바뀌고, Graph는 항상 같은 경로</span>
+  </div>
+
+  <div class="grid2">
+    <!-- REACT -->
+    <section class="panel react">
+      <div class="p-head">
+        <div class="p-tag">Single Agent · 모델 주도</div>
+        <div class="p-title">ReAct 루프</div>
+        <div class="p-sub">Reason → Act → Observe 를 스스로 반복. 몇 번 돌지, 어떤 툴을 부를지는 <b>LLM이 매 스텝 결정</b>.</div>
+      </div>
+      <div class="stage"><svg id="svg-react" viewBox="0 0 320 340" role="img" aria-label="ReAct 루프 다이어그램"></svg></div>
+      <div class="meter">
+        <div class="m"><span>반복(iteration)</span><b id="react-iter">0</b></div>
+        <div class="m"><span>실행 경로</span><b id="react-det" style="font-size:13px">비결정적</b></div>
+      </div>
+      <ul class="log" id="log-react"></ul>
+    </section>
+
+    <!-- GRAPH -->
+    <section class="panel graph">
+      <div class="p-head">
+        <div class="p-tag">Multi-Agent · 개발자 주도</div>
+        <div class="p-title">Graph (DAG)</div>
+        <div class="p-sub">노드(에이전트)와 엣지를 <b>미리 정의</b>. 실행 순서·분기·병렬이 <b>결정적</b>으로 고정됨.</div>
+      </div>
+      <div class="stage"><svg id="svg-graph" viewBox="0 0 320 430" role="img" aria-label="Graph DAG 다이어그램"></svg></div>
+      <div class="meter">
+        <div class="m"><span>노드(node)</span><b id="graph-node">0</b></div>
+        <div class="m"><span>실행 경로</span><b id="graph-det" style="font-size:13px">결정적</b></div>
+      </div>
+      <ul class="log" id="log-graph"></ul>
+    </section>
+  </div>
+
+  <div class="cmp">
+    <h2>핵심 차이</h2>
+    <div class="tbl-scroll">
+    <table>
+      <thead><tr><th>관점</th><th>ReAct (Agent)</th><th>Graph (GraphBuilder)</th></tr></thead>
+      <tbody>
+        <tr><td>제어 흐름</td><td>LLM이 매 스텝 다음 행동을 결정 (동적)</td><td>개발자가 정의한 노드·엣지 (정적 DAG)</td></tr>
+        <tr><td>실행 경로</td><td>실행마다 달라짐 — <b>비결정적</b></td><td>항상 동일 — <b>결정적</b></td></tr>
+        <tr><td>반복 방식</td><td>Reason→Act→Observe 루프를 스스로 종료</td><td>엣지를 따라 노드→노드 1회 통과</td></tr>
+        <tr><td>병렬성</td><td>루프 내 순차 (한 번에 툴 하나)</td><td>분기 노드를 <b>병렬</b> 실행 가능</td></tr>
+        <tr><td>예측·디버깅</td><td>어려움 (경로가 매번 다름)</td><td>쉬움 (경로가 고정)</td></tr>
+        <tr><td>적합한 작업</td><td>단계 수를 모르는 개방형 탐색</td><td>정형화된 다단계 파이프라인</td></tr>
+        <tr><td>상태 전달</td><td>대화 컨텍스트에 누적</td><td>노드 출력이 엣지를 따라 전달</td></tr>
+        <tr><td>Strands API</td><td><code>Agent(tools=[...])</code></td><td><code>GraphBuilder().add_node / add_edge</code></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="code2">
+    <pre class="react"><span class="h">ReAct — 단일 Agent</span><code class="blk"><span class="cm"># 툴만 쥐어주면, 루프는 모델이 알아서</span>
+<span class="kw">from</span> strands <span class="kw">import</span> Agent
+<span class="kw">from</span> strands_tools <span class="kw">import</span> calculator, http_request
+
+agent = <span class="fn">Agent</span>(tools=[calculator, http_request])
+agent(<span class="st">"프랑스와 일본 GDP를 비교해줘"</span>)
+<span class="cm"># reason → tool → observe → … → answer</span>
+<span class="cm"># 몇 번 돌지는 실행 시점에 결정됨</span></code></pre>
+
+    <pre class="graph"><span class="h">Graph — 다중 Agent DAG</span><code class="blk"><span class="kw">from</span> strands.multiagent <span class="kw">import</span> GraphBuilder
+
+b = <span class="fn">GraphBuilder</span>()
+b.<span class="fn">add_node</span>(classifier, <span class="st">"classify"</span>)
+b.<span class="fn">add_node</span>(researcher, <span class="st">"research"</span>)
+b.<span class="fn">add_node</span>(writer,     <span class="st">"write"</span>)
+b.<span class="fn">add_edge</span>(<span class="st">"classify"</span>, <span class="st">"research"</span>)
+b.<span class="fn">add_edge</span>(<span class="st">"research"</span>, <span class="st">"write"</span>)
+graph = b.<span class="fn">build</span>()
+graph(<span class="st">"프랑스와 일본 GDP를 비교해줘"</span>)  <span class="cm"># 경로 고정</span></code></pre>
+  </div>
+
+  <div class="foot">
+    <div class="bar"></div>
+    <p><b>배포는 둘 다 똑같습니다.</b> ReAct든 Graph든 <code>@app.entrypoint</code> 로 감싸 <b>Bedrock AgentCore Runtime</b> 위에 올리는 방식은 동일해요. 차이는 <b>런타임 안에서 어떻게 실행되느냐</b>일 뿐 — 짧고 개방적인 작업엔 ReAct, 순서·검증이 중요한 다단계 파이프라인엔 Graph가 맞습니다.</p>
+  </div>
+
+</div>
+</div>
+
+<script>
+(function(){
+  const SVGNS="http://www.w3.org/2000/svg";
+  const reduce = matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const HW={react:58,graph:54}, HH=23;
+
+  // ---- node/edge configs ----
+  const react = {
+    nodes:{
+      prompt:{x:95,y:56,lab:"Prompt",sub:"입력"},
+      reason:{x:95,y:150,lab:"Reason",sub:"LLM 판단"},
+      act:{x:232,y:88,lab:"Act",sub:"tool call"},
+      observe:{x:232,y:230,lab:"Observe",sub:"결과 관찰"},
+      answer:{x:95,y:288,lab:"Answer",sub:"최종 응답"},
+    },
+    edges:[
+      {id:"prompt-reason",a:"prompt",b:"reason"},
+      {id:"reason-act",a:"reason",b:"act",lab:"툴 필요"},
+      {id:"act-observe",a:"act",b:"observe"},
+      {id:"observe-reason",a:"observe",b:"reason",cls:"loop",lab:"loop"},
+      {id:"reason-answer",a:"reason",b:"answer",lab:"완료"},
+    ], hw:HW.react
+  };
+  const graph = {
+    nodes:{
+      entry:{x:160,y:44,lab:"Entry",sub:"입력"},
+      classify:{x:160,y:132,lab:"Classify",sub:"분류"},
+      research:{x:86,y:234,lab:"Research",sub:"조사"},
+      retrieve:{x:234,y:234,lab:"Retrieve",sub:"검색"},
+      synth:{x:160,y:332,lab:"Synthesize",sub:"종합"},
+      output:{x:160,y:404,lab:"Output",sub:"출력"},
+    },
+    edges:[
+      {id:"entry-classify",a:"entry",b:"classify"},
+      {id:"classify-research",a:"classify",b:"research"},
+      {id:"classify-retrieve",a:"classify",b:"retrieve"},
+      {id:"research-synth",a:"research",b:"synth"},
+      {id:"retrieve-synth",a:"retrieve",b:"synth"},
+      {id:"synth-output",a:"synth",b:"output"},
+    ], hw:HW.graph
+  };
+
+  function clip(cx,cy,hw,tx,ty){
+    let dx=tx-cx, dy=ty-cy;
+    if(dx===0&&dy===0) return[cx,cy];
+    const sx = dx!==0 ? hw/Math.abs(dx) : Infinity;
+    const sy = dy!==0 ? HH/Math.abs(dy) : Infinity;
+    const t=Math.min(sx,sy);
+    return[cx+dx*t, cy+dy*t];
+  }
+
+  function build(svg,cfg){
+    svg.innerHTML="";
+    const defs=document.createElementNS(SVGNS,"defs");
+    const mk=(id,color)=>{
+      const m=document.createElementNS(SVGNS,"marker");
+      m.setAttribute("id",id);m.setAttribute("markerWidth","8");m.setAttribute("markerHeight","8");
+      m.setAttribute("refX","6");m.setAttribute("refY","3");m.setAttribute("orient","auto");
+      const p=document.createElementNS(SVGNS,"path");
+      p.setAttribute("d","M0,0 L6,3 L0,6 Z");p.setAttribute("fill",color);
+      m.appendChild(p);return m;
+    };
+    defs.appendChild(mk("arr-"+cfg.tag,getComputedStyle(svg).getPropertyValue("--line-strong")||"#888"));
+    defs.appendChild(mk("arrlit-"+cfg.tag,"var(--accent)"));
+    svg.appendChild(defs);
+
+    cfg.edgeEls={};
+    cfg.edges.forEach(e=>{
+      const A=cfg.nodes[e.a],B=cfg.nodes[e.b];
+      const s=clip(A.x,A.y,cfg.hw,B.x,B.y);
+      const t=clip(B.x,B.y,cfg.hw,A.x,A.y);
+      const path=document.createElementNS(SVGNS,"path");
+      path.setAttribute("d",`M${s[0]},${s[1]} L${t[0]},${t[1]}`);
+      path.setAttribute("class","edge"+(e.cls?" "+e.cls:""));
+      path.setAttribute("marker-end","url(#arr-"+cfg.tag+")");
+      path.dataset.arrlit="url(#arrlit-"+cfg.tag+")";
+      svg.appendChild(path);
+      cfg.edgeEls[e.id]=path;
+      if(e.lab){
+        const mx=(s[0]+t[0])/2, my=(s[1]+t[1])/2;
+        const tx=document.createElementNS(SVGNS,"text");
+        tx.setAttribute("x",mx+6);tx.setAttribute("y",my-3);
+        tx.setAttribute("class","edge-lab");tx.textContent=e.lab;
+        svg.appendChild(tx);
+      }
+    });
+
+    cfg.nodeEls={};
+    Object.entries(cfg.nodes).forEach(([id,n])=>{
+      const g=document.createElementNS(SVGNS,"g");g.setAttribute("class","node");
+      const r=document.createElementNS(SVGNS,"rect");
+      r.setAttribute("x",n.x-cfg.hw);r.setAttribute("y",n.y-HH);
+      r.setAttribute("width",cfg.hw*2);r.setAttribute("height",HH*2);
+      r.setAttribute("rx","9");g.appendChild(r);
+      const l=document.createElementNS(SVGNS,"text");
+      l.setAttribute("x",n.x);l.setAttribute("y",n.y-1);l.setAttribute("text-anchor","middle");
+      l.setAttribute("class","lab");l.textContent=n.lab;g.appendChild(l);
+      const s=document.createElementNS(SVGNS,"text");
+      s.setAttribute("x",n.x);s.setAttribute("y",n.y+13);s.setAttribute("text-anchor","middle");
+      s.setAttribute("class","sub");s.textContent=n.sub;g.appendChild(s);
+      svg.appendChild(g);cfg.nodeEls[id]=g;
+    });
+  }
+
+  react.tag="react"; graph.tag="graph";
+  const svgR=document.getElementById("svg-react"), svgG=document.getElementById("svg-graph");
+  function rebuild(){build(svgR,react);build(svgG,graph);}
+  rebuild();
+
+  // ---- animation ----
+  let running=false, tokens=[];
+  function clearRun(){
+    tokens.forEach(t=>t.remove()); tokens=[];
+    [react,graph].forEach(cfg=>{
+      Object.values(cfg.nodeEls).forEach(n=>n.classList.remove("active","done"));
+      Object.values(cfg.edgeEls).forEach(e=>{e.classList.remove("lit");e.setAttribute("marker-end","url(#arr-"+cfg.tag+")");});
+    });
+    ["log-react","log-graph"].forEach(id=>document.getElementById(id).innerHTML="");
+    document.getElementById("react-iter").textContent="0";
+    document.getElementById("graph-node").textContent="0";
+  }
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+  function litEdge(cfg,id,on){
+    const e=cfg.edgeEls[id]; if(!e)return;
+    e.classList.toggle("lit",on);
+    e.setAttribute("marker-end", on?e.dataset.arrlit:"url(#arr-"+cfg.tag+")");
+  }
+  function runPulse(cfg,svg,edgeId,dur){
+    return new Promise(res=>{
+      const path=cfg.edgeEls[edgeId]; litEdge(cfg,edgeId,true);
+      if(reduce){setTimeout(res,120);return;}
+      const len=path.getTotalLength();
+      const c=document.createElementNS(SVGNS,"circle");
+      c.setAttribute("r","4.5");c.setAttribute("class","pulse");svg.appendChild(c);tokens.push(c);
+      const t0=performance.now();
+      (function step(now){
+        let k=Math.min(1,(now-t0)/dur);
+        const p=path.getPointAtLength(len*k);
+        c.setAttribute("cx",p.x);c.setAttribute("cy",p.y);
+        if(k<1)requestAnimationFrame(step);
+        else{c.remove();tokens=tokens.filter(x=>x!==c);res();}
+      })(t0);
+    });
+  }
+  function addLog(id,step,txt,fin){
+    const ul=document.getElementById(id);
+    const li=document.createElement("li");
+    if(fin)li.className="fin";
+    li.innerHTML=`<span class="step">${step}</span><span>${txt}</span>`;
+    ul.appendChild(li);
+  }
+
+  async function runReact(){
+    const cfg=react,svg=svgR,D=reduce?0:640;
+    const iterEl=document.getElementById("react-iter");
+    const iters=2+Math.floor(Math.random()*3); // 2..4  → 매번 다름
+    cfg.nodeEls.prompt.classList.add("active");
+    addLog("log-react","in","📥 프롬프트 수신 → reason");
+    await runPulse(cfg,svg,"prompt-reason",D);
+    cfg.nodeEls.prompt.classList.remove("active");cfg.nodeEls.prompt.classList.add("done");
+    cfg.nodeEls.reason.classList.add("active");
+    await wait(160);
+    for(let i=1;i<=iters;i++){
+      iterEl.textContent=i;
+      addLog("log-react","·","🧠 iter "+i+": 판단 → 툴 호출");
+      cfg.nodeEls.reason.classList.remove("active");
+      await runPulse(cfg,svg,"reason-act",D);
+      litEdge(cfg,"reason-act",false);
+      cfg.nodeEls.act.classList.add("active");await wait(120);
+      cfg.nodeEls.act.classList.remove("active");
+      await runPulse(cfg,svg,"act-observe",D);
+      litEdge(cfg,"act-observe",false);
+      cfg.nodeEls.observe.classList.add("active");
+      addLog("log-react","·","🔧 툴 실행 → 👁 결과 관찰");await wait(160);
+      cfg.nodeEls.observe.classList.remove("active");
+      await runPulse(cfg,svg,"observe-reason",D);
+      litEdge(cfg,"observe-reason",false);
+      cfg.nodeEls.reason.classList.add("active");
+      if(i<iters)addLog("log-react","↩","아직 부족 → 루프 반복");
+      await wait(140);
+    }
+    addLog("log-react","↩","정보 충분 → 종료 판단");
+    cfg.nodeEls.reason.classList.remove("active");
+    await runPulse(cfg,svg,"reason-answer",D);
+    litEdge(cfg,"reason-answer",false);
+    cfg.nodeEls.reason.classList.add("done");
+    cfg.nodeEls.answer.classList.add("active","done");
+    addLog("log-react","✓","✅ 최종 응답 ("+iters+"회 반복 후)",true);
+  }
+
+  async function runGraph(){
+    const cfg=graph,svg=svgG,D=reduce?0:640;
+    const nEl=document.getElementById("graph-node");
+    let n=0; const bump=()=>nEl.textContent=++n;
+    cfg.nodeEls.entry.classList.add("active");bump();
+    addLog("log-graph","▶","entry → classify");
+    await runPulse(cfg,svg,"entry-classify",D);litEdge(cfg,"entry-classify",false);
+    cfg.nodeEls.entry.classList.remove("active");cfg.nodeEls.entry.classList.add("done");
+    cfg.nodeEls.classify.classList.add("active");bump();await wait(160);
+    addLog("log-graph","⑂","분기 → research + retrieve (병렬)");
+    cfg.nodeEls.classify.classList.remove("active");cfg.nodeEls.classify.classList.add("done");
+    await Promise.all([
+      runPulse(cfg,svg,"classify-research",D),
+      runPulse(cfg,svg,"classify-retrieve",D),
+    ]);
+    litEdge(cfg,"classify-research",false);litEdge(cfg,"classify-retrieve",false);
+    cfg.nodeEls.research.classList.add("active");cfg.nodeEls.retrieve.classList.add("active");bump();bump();
+    await wait(200);
+    addLog("log-graph","⑃","조인 → synthesize");
+    cfg.nodeEls.research.classList.remove("active");cfg.nodeEls.research.classList.add("done");
+    cfg.nodeEls.retrieve.classList.remove("active");cfg.nodeEls.retrieve.classList.add("done");
+    await Promise.all([
+      runPulse(cfg,svg,"research-synth",D),
+      runPulse(cfg,svg,"retrieve-synth",D),
+    ]);
+    litEdge(cfg,"research-synth",false);litEdge(cfg,"retrieve-synth",false);
+    cfg.nodeEls.synth.classList.add("active");bump();await wait(160);
+    addLog("log-graph","■","synthesize → output");
+    cfg.nodeEls.synth.classList.remove("active");cfg.nodeEls.synth.classList.add("done");
+    await runPulse(cfg,svg,"synth-output",D);litEdge(cfg,"synth-output",false);
+    cfg.nodeEls.output.classList.add("active","done");bump();
+    addLog("log-graph","✓","✅ 출력 (항상 동일한 6-노드 경로)",true);
+  }
+
+  const runBtn=document.getElementById("run"), resetBtn=document.getElementById("reset");
+  runBtn.addEventListener("click",async()=>{
+    if(running)return; running=true; runBtn.disabled=true; resetBtn.disabled=true;
+    clearRun();
+    await Promise.all([runReact(),runGraph()]);
+    running=false; runBtn.disabled=false; resetBtn.disabled=false;
+  });
+  resetBtn.addEventListener("click",()=>{if(!running)clearRun();});
+
+  // recolor arrowheads on theme change
+  new MutationObserver(rebuild).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();
+</script>
